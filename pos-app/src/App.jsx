@@ -271,22 +271,22 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState(String(todayObj.getDate()));
 
   useEffect(() => {
-  async function fetchMenuItems() {
-    try {
-      const { data, error } = await supabase.from("menu_items").select("*");
-      if (error) throw error;
-      if (data && data.length > 0) {
-        setMenuItems(data);
-      } else {
+    async function fetchMenuItems() {
+      try {
+        const { data, error } = await supabase.from("menu_items").select("*");
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setMenuItems(data);
+        } else {
+          setMenuItems(initialMenuItems);
+        }
+      } catch (err) {
+        console.error("Error loading menu from Supabase, using initial data:", err);
         setMenuItems(initialMenuItems);
       }
-    } catch (err) {
-      console.error("Error loading menu from Supabase, using initial data:", err);
-      setMenuItems(initialMenuItems);
     }
-  }
-  fetchMenuItems();
-}, []);
+    fetchMenuItems();
+  }, []);
 
   const [adminSubTab, setAdminSubTab] = useState("menu");
 
@@ -326,7 +326,12 @@ export default function App() {
 
   const [newSweetness, setNewSweetness] = useState("");
   const [newMilk, setNewMilk] = useState("");
-  const [newAddon, setNewAddon] = useState("");
+
+  // 🔥 State สำหรับสร้างท็อปปิ้งแบบผูกวัตถุดิบ
+  const [addonName, setAddonName] = useState("");
+  const [addonPrice, setAddonPrice] = useState("");
+  const [selectedAddonIng, setSelectedAddonIng] = useState("");
+  const [addonIngAmount, setAddonIngAmount] = useState("");
 
   const [ingForm, setIngForm] = useState({
     name: "",
@@ -495,12 +500,14 @@ export default function App() {
   const total = Math.max(0, subtotal - effectiveDiscount);
   const vat = (total * 7) / 107;
 
+  // 🔥 ฟังก์ชันหักสต็อกอัตโนมัติ (รองรับสูตรหลัก นมสด และท็อปปิ้ง)
   const deductInventoryStock = (cartItems) => {
     setIngredients((prevIngs) => {
       const updated = [...prevIngs];
       cartItems.forEach((cartItem) => {
         const qty = cartItem.qty;
 
+        // 1. ตัดสต็อกตามสูตรหลักของเมนู (Recipe)
         if (cartItem.recipe) {
           cartItem.recipe.forEach((r) => {
             const idx = updated.findIndex((i) => i.id === r.ingId);
@@ -513,6 +520,7 @@ export default function App() {
           });
         }
 
+        // 2. ตัดสต็อกตามตัวเลือกนม (Milk)
         if (cartItem.selectedMilk && cartItem.selectedMilk.ingId) {
           const idx = updated.findIndex(
             (i) => i.id === cartItem.selectedMilk.ingId
@@ -528,14 +536,18 @@ export default function App() {
           }
         }
 
-        if (cartItem.selectedAddonsList) {
+        // 3. 🔥 ตัดสต็อกตามท็อปปิ้งที่เลือก (Addons)
+        if (cartItem.selectedAddonsList && cartItem.selectedAddonsList.length > 0) {
           cartItem.selectedAddonsList.forEach((addon) => {
-            if (addon.ingId) {
+            if (addon.ingId && addon.amount) {
               const idx = updated.findIndex((i) => i.id === addon.ingId);
               if (idx !== -1) {
                 updated[idx] = {
                   ...updated[idx],
-                  stock: Math.max(0, updated[idx].stock - addon.amount * qty),
+                  stock: Math.max(
+                    0,
+                    updated[idx].stock - addon.amount * qty
+                  ),
                 };
               }
             }
@@ -575,9 +587,6 @@ export default function App() {
           : 0,
     };
 
-    // -------------------------------------------------------------
-    // 🔥 บันทึกลง Supabase เพิ่มเติมตรงจุดนี้
-    // -------------------------------------------------------------
     try {
       await supabase.from("orders").insert([
         {
@@ -593,9 +602,7 @@ export default function App() {
     } catch (err) {
       console.error("Failed to save order to Supabase:", err);
     }
-    // -------------------------------------------------------------
 
-    // อัปเดต State ใน React ตามเดิม
     setOrderHistory([newOrder, ...orderHistory]);
     setKitchenOrders((prev) => [...prev, newOrder]);
     setOrderQueueCount((q) => q + 1);
@@ -760,114 +767,142 @@ export default function App() {
     setNewMilk("");
   };
 
-  const addAddonOption = () => {
-    const val = newAddon.trim();
-    if (!val) return;
+  // 🔥 ฟังก์ชันกดเพิ่มท็อปปิ้งพร้อมการเลือกวัตถุดิบและใส่ปริมาณ
+  const handleAddAddonOption = () => {
+    if (!addonName) return;
+    const price = Number(addonPrice) || 0;
+
+    let addonString = `${addonName} (+${price})`;
+    if (selectedAddonIng && addonIngAmount) {
+      addonString += ` [${selectedAddonIng}:${addonIngAmount}]`;
+    }
+
     const current = itemForm.addonsText
       ? itemForm.addonsText.split(",").map((s) => s.trim())
       : [];
-    setItemForm({ ...itemForm, addonsText: [...current, val].join(", ") });
-    setNewAddon("");
+
+    setItemForm({
+      ...itemForm,
+      addonsText: [...current, addonString].join(", "),
+    });
+
+    setAddonName("");
+    setAddonPrice("");
+    setSelectedAddonIng("");
+    setAddonIngAmount("");
   };
 
-  // --- UPDATED handleSaveItem WITH PARSERS ---
   const handleSaveItem = async (e) => {
-  e.preventDefault();
-  if (!itemForm.name || !itemForm.price) return;
+    e.preventDefault();
+    if (!itemForm.name || !itemForm.price) return;
 
-  const sweetnessOptions = itemForm.sweetnessText
-    ? itemForm.sweetnessText.split(",").map((s) => s.trim()).filter(Boolean)
-    : [];
+    const sweetnessOptions = itemForm.sweetnessText
+      ? itemForm.sweetnessText.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
 
-  const milkOptions = itemForm.milkText
-    ? itemForm.milkText.split(",").map((m, idx) => {
-        const match = m.match(/(.+)\s*\(\+(\d+)\)/);
-        if (match) {
-          return { id: `m_${idx}_${Date.now()}`, label: match[1].trim(), price: Number(match[2]) };
+    const milkOptions = itemForm.milkText
+      ? itemForm.milkText
+          .split(",")
+          .map((m, idx) => {
+            const match = m.match(/(.+)\s*\(\+(\d+)\)/);
+            if (match) {
+              return {
+                id: `m_${idx}_${Date.now()}`,
+                label: match[1].trim(),
+                price: Number(match[2]),
+              };
+            }
+            return { id: `m_${idx}_${Date.now()}`, label: m.trim(), price: 0 };
+          })
+          .filter((m) => m.label)
+      : [];
+
+    const addons = itemForm.addonsText
+      ? itemForm.addonsText
+          .split(",")
+          .map((a, idx) => {
+            const match = a.match(/(.+)\s*\(\+(\d+)\)(?:\s*\[(.+):(\d+)\])?/);
+            if (match) {
+              return {
+                id: `a_${idx}_${Date.now()}`,
+                label: match[1].trim(),
+                price: Number(match[2]),
+                ingId: match[3] ? match[3].trim() : null,
+                amount: match[4] ? Number(match[4]) : 0,
+              };
+            }
+            return { id: `a_${idx}_${Date.now()}`, label: a.trim(), price: 0 };
+          })
+          .filter((a) => a.label)
+      : [];
+
+    const itemPayload = {
+      name: itemForm.name,
+      price: Number(itemForm.price),
+      category: itemForm.category,
+      subCategory: itemForm.subCategory,
+      image:
+        itemForm.image ||
+        "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400",
+      inStock: itemForm.inStock,
+      sweetnessOptions,
+      milkOptions,
+      addons,
+      recipe: itemForm.recipe || [],
+    };
+
+    try {
+      if (editingItem) {
+        const { data, error } = await supabase
+          .from("menu_items")
+          .update(itemPayload)
+          .eq("id", editingItem.id)
+          .select();
+
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setMenuItems((prev) =>
+            prev.map((item) => (item.id === editingItem.id ? data[0] : item))
+          );
         }
-        return { id: `m_${idx}_${Date.now()}`, label: m.trim(), price: 0 };
-      }).filter((m) => m.label)
-    : [];
+      } else {
+        const { data, error } = await supabase
+          .from("menu_items")
+          .insert([itemPayload])
+          .select();
 
-  const addons = itemForm.addonsText
-    ? itemForm.addonsText.split(",").map((a, idx) => {
-        const match = a.match(/(.+)\s*\(\+(\d+)\)/);
-        if (match) {
-          return { id: `a_${idx}_${Date.now()}`, label: match[1].trim(), price: Number(match[2]) };
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setMenuItems((prev) => [...prev, data[0]]);
         }
-        return { id: `a_${idx}_${Date.now()}`, label: a.trim(), price: 0 };
-      }).filter((a) => a.label)
-    : [];
-
-  const itemPayload = {
-    name: itemForm.name,
-    price: Number(itemForm.price),
-    category: itemForm.category,
-    subCategory: itemForm.subCategory,
-    image:
-      itemForm.image ||
-      "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400",
-    inStock: itemForm.inStock,
-    sweetnessOptions,
-    milkOptions,
-    addons,
-    recipe: itemForm.recipe || [],
-  };
-
-  try {
-    if (editingItem) {
-      // แก้ไขสินค้าใน Supabase
-      const { data, error } = await supabase
-        .from("menu_items")
-        .update(itemPayload)
-        .eq("id", editingItem.id)
-        .select();
-
-      if (error) throw error;
-      if (data && data.length > 0) {
+      }
+    } catch (err) {
+      console.error("Supabase operation failed, fallback to local state:", err);
+      if (editingItem) {
         setMenuItems((prev) =>
-          prev.map((item) => (item.id === editingItem.id ? data[0] : item))
+          prev.map((item) =>
+            item.id === editingItem.id ? { ...item, ...itemPayload } : item
+          )
         );
-      }
-    } else {
-      // เพิ่มสินค้าใหม่ลง Supabase
-      const { data, error } = await supabase
-        .from("menu_items")
-        .insert([itemPayload])
-        .select();
-
-      if (error) throw error;
-      if (data && data.length > 0) {
-        setMenuItems((prev) => [...prev, data[0]]);
+      } else {
+        setMenuItems((prev) => [...prev, { id: Date.now(), ...itemPayload }]);
       }
     }
-  } catch (err) {
-    console.error("Supabase operation failed, fallback to local state:", err);
-    if (editingItem) {
-      setMenuItems((prev) =>
-        prev.map((item) =>
-          item.id === editingItem.id ? { ...item, ...itemPayload } : item
-        )
-      );
-    } else {
-      setMenuItems((prev) => [...prev, { id: Date.now(), ...itemPayload }]);
-    }
-  }
 
-  setEditingItem(null);
-  setItemForm({
-    name: "",
-    price: "",
-    category: "coffee",
-    subCategory: "hot",
-    image: "",
-    inStock: true,
-    sweetnessText: "100%, 50%, 0%",
-    milkText: "นมสดธรรมดา (+0)",
-    addonsText: "เพิ่ม Shot กาแฟ (+25)",
-    recipe: [],
-  });
-};
+    setEditingItem(null);
+    setItemForm({
+      name: "",
+      price: "",
+      category: "coffee",
+      subCategory: "hot",
+      image: "",
+      inStock: true,
+      sweetnessText: "100%, 50%, 0%",
+      milkText: "นมสดธรรมดา (+0)",
+      addonsText: "เพิ่ม Shot กาแฟ (+25)",
+      recipe: [],
+    });
+  };
 
   const handleEditClick = (item) => {
     setEditingItem(item);
@@ -885,23 +920,29 @@ export default function App() {
         ? item.milkOptions.map((m) => `${m.label} (+${m.price})`).join(", ")
         : "",
       addonsText: item.addons
-        ? item.addons.map((a) => `${a.label} (+${a.price})`).join(", ")
+        ? item.addons
+            .map((a) =>
+              a.ingId && a.amount
+                ? `${a.label} (+${a.price}) [${a.ingId}:${a.amount}]`
+                : `${a.label} (+${a.price})`
+            )
+            .join(", ")
         : "",
       recipe: item.recipe || [],
     });
   };
 
   const handleDeleteItem = async (id) => {
-  if (confirm("คุณต้องการลบรายการสินค้านี้ใช่หรือไม่?")) {
-    try {
-      const { error } = await supabase.from("menu_items").delete().eq("id", id);
-      if (error) throw error;
-    } catch (err) {
-      console.error("Supabase delete failed:", err);
+    if (confirm("คุณต้องการลบรายการสินค้านี้ใช่หรือไม่?")) {
+      try {
+        const { error } = await supabase.from("menu_items").delete().eq("id", id);
+        if (error) throw error;
+      } catch (err) {
+        console.error("Supabase delete failed:", err);
+      }
+      setMenuItems((prev) => prev.filter((item) => item.id !== id));
     }
-    setMenuItems((prev) => prev.filter((item) => item.id !== id));
-  }
-};
+  };
 
   const monthNamesTh = [
     "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
@@ -2536,17 +2577,17 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* ท็อปปิ้ง / ตัวเลือกเพิ่มเติม */}
+                  {/* 🔥 ท็อปปิ้ง / ตัวเลือกเพิ่มเติม (ปรับแบบระบุการผูกตัดสต็อก) */}
                   <div className="bg-[#FBF9F6] p-3.5 rounded-2xl border border-[#E6DDD3] space-y-2">
                     <label className="font-extrabold text-[#5C4A42] block">
-                      ท็อปปิ้ง / ตัวเลือกเพิ่มเติม
+                      ท็อปปิ้ง / ตัวเลือกเพิ่มเติม (พร้อมการผูกตัดสต็อก)
                     </label>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
                       {itemForm.addonsText ? (
                         itemForm.addonsText.split(",").map((a, idx) => (
                           <span
                             key={idx}
-                            className="bg-white border border-[#E6DDD3] px-2.5 py-1 rounded-lg text-[#2C221E] font-medium flex items-center gap-1 shadow-xs"
+                            className="bg-white border border-[#E6DDD3] px-2.5 py-1 rounded-lg text-[#2C221E] font-medium flex items-center gap-1 shadow-xs text-[11px]"
                           >
                             {a.trim()}
                             <button
@@ -2569,24 +2610,57 @@ export default function App() {
                         ))
                       ) : (
                         <span className="text-[#A3978C] text-[11px]">
-                          ไม่มีตัวเลือก
+                          ไม่มีตัวเลือกท็อปปิ้ง
                         </span>
                       )}
                     </div>
-                    <div className="flex gap-1.5 pt-1">
-                      <input
-                        type="text"
-                        value={newAddon}
-                        onChange={(e) => setNewAddon(e.target.value)}
-                        placeholder="เช่น เพิ่ม วิปครีม (+15)"
-                        className="flex-1 bg-white p-2 border border-[#E6DDD3] rounded-lg text-xs outline-none font-semibold"
-                      />
+
+                    <div className="space-y-2 pt-1 border-t border-[#E6DDD3]">
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          value={addonName}
+                          onChange={(e) => setAddonName(e.target.value)}
+                          placeholder="ชื่อท็อปปิ้ง (เช่น วิปครีม)"
+                          className="bg-white p-2 border border-[#E6DDD3] rounded-lg text-xs outline-none font-semibold"
+                        />
+                        <input
+                          type="number"
+                          value={addonPrice}
+                          onChange={(e) => setAddonPrice(e.target.value)}
+                          placeholder="ราคาบวกเพิ่ม (เช่น 15)"
+                          className="bg-white p-2 border border-[#E6DDD3] rounded-lg text-xs outline-none font-semibold"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          value={selectedAddonIng}
+                          onChange={(e) => setSelectedAddonIng(e.target.value)}
+                          className="bg-white p-2 border border-[#E6DDD3] rounded-lg text-xs outline-none font-semibold"
+                        >
+                          <option value="">-- ไม่ตัดวัตถุดิบเพิ่มเติม --</option>
+                          {ingredients.map((ing) => (
+                            <option key={ing.id} value={ing.id}>
+                              {ing.name} ({ing.unit})
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="number"
+                          value={addonIngAmount}
+                          onChange={(e) => setAddonIngAmount(e.target.value)}
+                          placeholder="ปริมาณที่ใช้ตัดสต็อก"
+                          className="bg-white p-2 border border-[#E6DDD3] rounded-lg text-xs outline-none font-semibold"
+                        />
+                      </div>
+
                       <button
                         type="button"
-                        onClick={addAddonOption}
-                        className="bg-[#B08968] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
+                        onClick={handleAddAddonOption}
+                        className="w-full bg-[#B08968] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#8C6239] transition"
                       >
-                        + เพิ่ม
+                        + เพิ่มท็อปปิ้งในเมนูนี้
                       </button>
                     </div>
                   </div>
