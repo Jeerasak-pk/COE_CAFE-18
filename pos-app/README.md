@@ -36,4 +36,4 @@ git add .  เช็ก/เพิ่มไฟล์ที่แก้ไขเ�
 
 git commit -m "update App.jsx add ingredient mapping to toppings"  บันทึก Commit (ใส่ข้อความกำกับไว้หน่อยกันลืม)
 
-git push  Push ขึ้น GitHub (เว็บบน Vercel จะดึงไปปรับใช้อัตโนมัติทันที)
+git push -- Push ขึ้น GitHub (เว็บบน Vercel จะดึงไปปรับใช้อัตโนมัติทันที)

@@ -41,6 +41,7 @@ import {
   Package,
   Filter,
   Sparkles,
+  Ban,
 } from "lucide-react";
 
 // --- Master Initial Data ---
@@ -270,22 +271,73 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState(todayObj.getMonth());
   const [selectedDay, setSelectedDay] = useState(String(todayObj.getDate()));
 
-  useEffect(() => {
-    async function fetchMenuItems() {
-      try {
-        const { data, error } = await supabase.from("menu_items").select("*");
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setMenuItems(data);
-        } else {
-          setMenuItems(initialMenuItems);
-        }
-      } catch (err) {
-        console.error("Error loading menu from Supabase, using initial data:", err);
+  // 🔄 🔥 Supabase Fetch & Realtime Subscription
+  const fetchAllData = async () => {
+    try {
+      // 1. Fetch Menu Items
+      const { data: menuData } = await supabase.from("menu_items").select("*");
+      if (menuData && menuData.length > 0) {
+        setMenuItems(menuData);
+      } else {
         setMenuItems(initialMenuItems);
       }
+
+      // 2. Fetch Orders
+      const { data: ordersData } = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (ordersData) {
+        const formattedOrders = ordersData.map((o) => ({
+          id: o.id,
+          queueNo: o.queue_no,
+          total: o.total,
+          status: o.status,
+          orderType: o.order_type,
+          paymentMethod: o.payment_method,
+          items: o.items || [],
+          date: new Date(o.created_at).toLocaleDateString("th-TH"),
+          time: new Date(o.created_at).toLocaleTimeString("th-TH", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          createdAt: o.created_at,
+          subtotal: o.total,
+          vat: (o.total * 7) / 107,
+          discount: 0,
+        }));
+        setOrderHistory(formattedOrders);
+        setKitchenOrders(
+          formattedOrders.filter(
+            (o) => o.status === "pending" || o.status === "preparing"
+          )
+        );
+        setOrderQueueCount(ordersData.length + 1);
+      }
+    } catch (err) {
+      console.error("Error fetching data from Supabase:", err);
     }
-    fetchMenuItems();
+  };
+
+  useEffect(() => {
+    fetchAllData();
+
+    // 📡 เปิดใช้งาน Realtime Listener ให้ Sync ข้ามเครื่อง
+    const channel = supabase
+      .channel("realtime-orders-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => {
+          fetchAllData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const [adminSubTab, setAdminSubTab] = useState("menu");
@@ -327,7 +379,6 @@ export default function App() {
   const [newSweetness, setNewSweetness] = useState("");
   const [newMilk, setNewMilk] = useState("");
 
-  // 🔥 State สำหรับสร้างท็อปปิ้งแบบผูกวัตถุดิบ
   const [addonName, setAddonName] = useState("");
   const [addonPrice, setAddonPrice] = useState("");
   const [selectedAddonIng, setSelectedAddonIng] = useState("");
@@ -500,14 +551,13 @@ export default function App() {
   const total = Math.max(0, subtotal - effectiveDiscount);
   const vat = (total * 7) / 107;
 
-  // 🔥 ฟังก์ชันหักสต็อกอัตโนมัติ (รองรับสูตรหลัก นมสด และท็อปปิ้ง)
+  // 🔥 ฟังก์ชันหักสต็อกวัตถุดิบ (เรียกเมื่อกด "ทำเสร็จสิ้น" ในครัว)
   const deductInventoryStock = (cartItems) => {
     setIngredients((prevIngs) => {
       const updated = [...prevIngs];
       cartItems.forEach((cartItem) => {
         const qty = cartItem.qty;
 
-        // 1. ตัดสต็อกตามสูตรหลักของเมนู (Recipe)
         if (cartItem.recipe) {
           cartItem.recipe.forEach((r) => {
             const idx = updated.findIndex((i) => i.id === r.ingId);
@@ -520,7 +570,6 @@ export default function App() {
           });
         }
 
-        // 2. ตัดสต็อกตามตัวเลือกนม (Milk)
         if (cartItem.selectedMilk && cartItem.selectedMilk.ingId) {
           const idx = updated.findIndex(
             (i) => i.id === cartItem.selectedMilk.ingId
@@ -536,7 +585,6 @@ export default function App() {
           }
         }
 
-        // 3. 🔥 ตัดสต็อกตามท็อปปิ้งที่เลือก (Addons)
         if (cartItem.selectedAddonsList && cartItem.selectedAddonsList.length > 0) {
           cartItem.selectedAddonsList.forEach((addon) => {
             if (addon.ingId && addon.amount) {
@@ -559,54 +607,26 @@ export default function App() {
   };
 
   const handleProcessPayment = async () => {
-    deductInventoryStock(cart);
-
     const orderTime = new Date();
-    const newOrder = {
-      id: `INV-${orderTime.getTime().toString().slice(-6)}`,
-      queueNo: `#${String(orderQueueCount).padStart(2, "0")}`,
-      date: orderTime.toLocaleDateString("th-TH"),
-      time: orderTime.toLocaleTimeString("th-TH", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      createdAt: orderTime,
+    const orderId = `INV-${orderTime.getTime().toString().slice(-6)}`;
+    const queueNo = `#${String(orderQueueCount).padStart(2, "0")}`;
+
+    const newOrderPayload = {
+      id: orderId,
+      queue_no: queueNo,
+      total: total,
       status: "pending",
-      items: [...cart],
-      subtotal,
-      discount: effectiveDiscount,
-      promoApplied: selectedPromo ? selectedPromo.code : null,
-      vat,
-      total,
-      orderType,
-      paymentMethod: paymentMethod === "qr" ? "สแกน QR Code" : "เงินสด",
-      cashReceived: paymentMethod === "cash" ? Number(cashReceived) : total,
-      change:
-        paymentMethod === "cash"
-          ? Math.max(0, Number(cashReceived) - total)
-          : 0,
+      order_type: orderType,
+      payment_method: paymentMethod === "qr" ? "สแกน QR Code" : "เงินสด",
+      items: cart,
     };
 
     try {
-      await supabase.from("orders").insert([
-        {
-          id: newOrder.id,
-          queue_no: newOrder.queueNo,
-          total: total,
-          status: "pending",
-          order_type: orderType,
-          payment_method: paymentMethod === "qr" ? "สแกน QR Code" : "เงินสด",
-          items: cart,
-        },
-      ]);
+      await supabase.from("orders").insert([newOrderPayload]);
     } catch (err) {
       console.error("Failed to save order to Supabase:", err);
     }
 
-    setOrderHistory([newOrder, ...orderHistory]);
-    setKitchenOrders((prev) => [...prev, newOrder]);
-    setOrderQueueCount((q) => q + 1);
-    setActiveReceipt(newOrder);
     setIsCheckoutOpen(false);
     setCart([]);
     setCashReceived("");
@@ -614,13 +634,37 @@ export default function App() {
     setSelectedPromo(null);
   };
 
-  const handleUpdateOrderStatus = (orderId, nextStatus) => {
+  // 🔥 อัปเดตสถานะออเดอร์ (รองรับ Supabase Sync + ลบโดยไม่คิดเงิน/ไม่ตัดสต็อก)
+  const handleUpdateOrderStatus = async (orderId, nextStatus) => {
+    const targetOrder = kitchenOrders.find((o) => o.id === orderId);
+
     if (nextStatus === "completed") {
-      setKitchenOrders((prev) => prev.filter((o) => o.id !== orderId));
+      if (targetOrder) {
+        deductInventoryStock(targetOrder.items);
+      }
+      try {
+        await supabase.from("orders").update({ status: "completed" }).eq("id", orderId);
+      } catch (err) {
+        console.error("Failed to update status in Supabase:", err);
+      }
+    } else if (nextStatus === "cancelled") {
+      if (
+        confirm(
+          `คุณต้องการยกเลิกคำสั่งซื้อ ${targetOrder?.queueNo} ใช่หรือไม่? (จะไม่ทำการตัดสต็อกวัตถุดิบและไม่นำไปคิดยอดขาย)`
+        )
+      ) {
+        try {
+          await supabase.from("orders").update({ status: "cancelled" }).eq("id", orderId);
+        } catch (err) {
+          console.error("Failed to cancel order in Supabase:", err);
+        }
+      }
     } else {
-      setKitchenOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
-      );
+      try {
+        await supabase.from("orders").update({ status: nextStatus }).eq("id", orderId);
+      } catch (err) {
+        console.error("Failed to update status in Supabase:", err);
+      }
     }
   };
 
@@ -767,7 +811,6 @@ export default function App() {
     setNewMilk("");
   };
 
-  // 🔥 ฟังก์ชันกดเพิ่มท็อปปิ้งพร้อมการเลือกวัตถุดิบและใส่ปริมาณ
   const handleAddAddonOption = () => {
     if (!addonName) return;
     const price = Number(addonPrice) || 0;
@@ -853,40 +896,13 @@ export default function App() {
 
     try {
       if (editingItem) {
-        const { data, error } = await supabase
-          .from("menu_items")
-          .update(itemPayload)
-          .eq("id", editingItem.id)
-          .select();
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setMenuItems((prev) =>
-            prev.map((item) => (item.id === editingItem.id ? data[0] : item))
-          );
-        }
+        await supabase.from("menu_items").update(itemPayload).eq("id", editingItem.id);
       } else {
-        const { data, error } = await supabase
-          .from("menu_items")
-          .insert([itemPayload])
-          .select();
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setMenuItems((prev) => [...prev, data[0]]);
-        }
+        await supabase.from("menu_items").insert([itemPayload]);
       }
+      fetchAllData();
     } catch (err) {
-      console.error("Supabase operation failed, fallback to local state:", err);
-      if (editingItem) {
-        setMenuItems((prev) =>
-          prev.map((item) =>
-            item.id === editingItem.id ? { ...item, ...itemPayload } : item
-          )
-        );
-      } else {
-        setMenuItems((prev) => [...prev, { id: Date.now(), ...itemPayload }]);
-      }
+      console.error("Supabase operation failed:", err);
     }
 
     setEditingItem(null);
@@ -935,12 +951,11 @@ export default function App() {
   const handleDeleteItem = async (id) => {
     if (confirm("คุณต้องการลบรายการสินค้านี้ใช่หรือไม่?")) {
       try {
-        const { error } = await supabase.from("menu_items").delete().eq("id", id);
-        if (error) throw error;
+        await supabase.from("menu_items").delete().eq("id", id);
+        fetchAllData();
       } catch (err) {
         console.error("Supabase delete failed:", err);
       }
-      setMenuItems((prev) => prev.filter((item) => item.id !== id));
     }
   };
 
@@ -973,7 +988,9 @@ export default function App() {
     return isYearMatch && isMonthMatch && isDayMatch;
   };
 
-  const filteredDashboardOrders = orderHistory.filter(isOrderInSelectedRange);
+  // 🔥 คัดออเดอร์ที่ไม่โดนยกเลิกมาคำนวณยอดขาย
+  const validOrderHistory = orderHistory.filter((o) => o.status !== "cancelled");
+  const filteredDashboardOrders = validOrderHistory.filter(isOrderInSelectedRange);
   const filteredDashboardExpenses = expenses.filter(isExpenseInSelectedRange);
 
   const filterRevenue = filteredDashboardOrders.reduce((acc, o) => acc + o.total, 0);
@@ -983,10 +1000,10 @@ export default function App() {
   const filterAvgValue =
     filterOrdersCount > 0 ? filterRevenue / filterOrdersCount : 0;
 
-  const totalRevenueAll = orderHistory.reduce((acc, o) => acc + o.total, 0);
+  const totalRevenueAll = validOrderHistory.reduce((acc, o) => acc + o.total, 0);
   const totalExpensesAll = expenses.reduce((acc, e) => acc + e.amount, 0);
-  const totalOrdersCountAll = orderHistory.length;
-  const totalItemsSoldAll = orderHistory.reduce(
+  const totalOrdersCountAll = validOrderHistory.length;
+  const totalItemsSoldAll = validOrderHistory.reduce(
     (acc, order) =>
       acc + order.items.reduce((itemAcc, item) => itemAcc + item.qty, 0),
     0
@@ -995,7 +1012,7 @@ export default function App() {
   const getDailyBreakdownForSelectedMonth = () => {
     const dailyData = [];
     for (let day = 1; day <= daysInSelectedMonth; day++) {
-      const dayOrders = orderHistory.filter((o) => {
+      const dayOrders = validOrderHistory.filter((o) => {
         const d = o.createdAt ? new Date(o.createdAt) : new Date();
         return (
           d.getFullYear() === Number(selectedYear) &&
@@ -1076,7 +1093,7 @@ export default function App() {
       const dateStr = d.toLocaleDateString("th-TH");
       const dayName = i === 0 ? "วันนี้" : days[d.getDay()];
 
-      const daySales = orderHistory
+      const daySales = validOrderHistory
         .filter((order) => order.date === dateStr)
         .reduce((sum, order) => sum + order.total, 0);
 
@@ -1112,7 +1129,7 @@ export default function App() {
       const targetYear = targetDate.getFullYear();
       const targetMonth = targetDate.getMonth();
 
-      const monthSales = orderHistory
+      const monthSales = validOrderHistory
         .filter((order) => {
           const orderDate = order.createdAt ? new Date(order.createdAt) : new Date();
           return (
@@ -1522,11 +1539,11 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <UtensilsCrossed size={32} className="text-[#D4A373]" />
                 <h1 className="text-2xl font-black text-[#E6C5A2] tracking-tight">
-                  Kitchen & Barista Display Monitor
+                  Kitchen & Barista Realtime Monitor
                 </h1>
               </div>
               <p className="text-xs text-[#A3978C] mt-1 font-medium">
-                เรียงลำดับคิวลูกค้าล่วงหน้า (First-In, First-Out)
+                วัตถุดิบจะถูกตัดสต็อกจริงอัตโนมัติเมื่อกด "ทำเสร็จสิ้น" เท่านั้น
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -1560,7 +1577,7 @@ export default function App() {
                 return (
                   <div
                     key={order.id}
-                    className={`bg-[#1C1614] rounded-3xl border flex flex-col justify-between overflow-hidden shadow-2xl h-[530px] transition-all duration-300 ${
+                    className={`bg-[#1C1614] rounded-3xl border flex flex-col justify-between overflow-hidden shadow-2xl h-[550px] transition-all duration-300 ${
                       isPreparing
                         ? "border-[#D4A373] ring-2 ring-[#D4A373]/30"
                         : "border-[#2C231F]"
@@ -1706,13 +1723,14 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="p-3.5 bg-[#1C1614] border-t border-[#2C231F] shrink-0">
+                    {/* 🔥 ปุ่มการทำงานในครัว (เริ่มทำ / ทำเสร็จสิ้น / ยกเลิกออเดอร์) */}
+                    <div className="p-3.5 bg-[#1C1614] border-t border-[#2C231F] shrink-0 space-y-2">
                       {order.status === "pending" ? (
                         <button
                           onClick={() =>
                             handleUpdateOrderStatus(order.id, "preparing")
                           }
-                          className="w-full bg-[#B08968] hover:bg-[#8C6239] text-white font-extrabold py-3.5 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
+                          className="w-full bg-[#B08968] hover:bg-[#8C6239] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
                         >
                           ▶ เริ่มทำออเดอร์
                         </button>
@@ -1721,11 +1739,21 @@ export default function App() {
                           onClick={() =>
                             handleUpdateOrderStatus(order.id, "completed")
                           }
-                          className="w-full bg-[#2E6F40] hover:bg-[#235631] text-white font-extrabold py-3.5 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
+                          className="w-full bg-[#2E6F40] hover:bg-[#235631] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
                         >
-                          <Check size={16} /> ทำเสร็จสิ้น (เรียกลูกค้า)
+                          <Check size={16} /> ทำเสร็จสิ้น (ตัดสต็อกวัตถุดิบ)
                         </button>
                       )}
+
+                      {/* 🔥 ปุ่มยกเลิกสินค้า (ไม่นำไปคิดยอดขาย & ไม่ตัดสต็อก) */}
+                      <button
+                        onClick={() =>
+                          handleUpdateOrderStatus(order.id, "cancelled")
+                        }
+                        className="w-full bg-[#381E19] hover:bg-[#E07A5F] text-[#E07A5F] hover:text-white border border-[#E07A5F]/30 font-bold py-2 rounded-xl text-[11px] transition cursor-pointer flex justify-center items-center gap-1.5"
+                      >
+                        <Ban size={13} /> ยกเลิกออเดอร์นี้ (ไม่คิดเงิน/ไม่ตัดสต็อก)
+                      </button>
                     </div>
                   </div>
                 );
@@ -2159,7 +2187,11 @@ export default function App() {
                 filteredDashboardOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="p-4 bg-[#FBF9F6] rounded-2xl border border-[#F5EFE6] flex justify-between items-center hover:border-[#B08968] transition duration-200"
+                    className={`p-4 rounded-2xl border flex justify-between items-center transition ${
+                      order.status === "cancelled"
+                        ? "bg-[#FDF4F2] border-[#FADCD6] opacity-70"
+                        : "bg-[#FBF9F6] border-[#F5EFE6] hover:border-[#B08968]"
+                    }`}
                   >
                     <div>
                       <div className="flex items-center gap-2.5">
@@ -2175,9 +2207,9 @@ export default function App() {
                         <span className="text-[10px] bg-[#F5EFE6] text-[#B08968] px-2.5 py-0.5 rounded-full font-bold">
                           {order.paymentMethod}
                         </span>
-                        {order.promoApplied && (
-                          <span className="text-[10px] bg-[#E07A5F] text-white px-2.5 py-0.5 rounded-full font-bold">
-                            โค้ด: {order.promoApplied}
+                        {order.status === "cancelled" && (
+                          <span className="text-[10px] bg-[#E07A5F] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                            <Ban size={10} /> ยกเลิกแล้ว (ไม่คิดเงิน/ตัดสต็อก)
                           </span>
                         )}
                       </div>
@@ -2186,7 +2218,13 @@ export default function App() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-base font-black text-[#B08968]">
+                      <p
+                        className={`text-base font-black ${
+                          order.status === "cancelled"
+                            ? "line-through text-[#A3978C]"
+                            : "text-[#B08968]"
+                        }`}
+                      >
                         ฿{order.total.toFixed(2)}
                       </p>
                       <button
@@ -2577,7 +2615,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* 🔥 ท็อปปิ้ง / ตัวเลือกเพิ่มเติม (ปรับแบบระบุการผูกตัดสต็อก) */}
+                  {/* ท็อปปิ้ง / ตัวเลือกเพิ่มเติม */}
                   <div className="bg-[#FBF9F6] p-3.5 rounded-2xl border border-[#E6DDD3] space-y-2">
                     <label className="font-extrabold text-[#5C4A42] block">
                       ท็อปปิ้ง / ตัวเลือกเพิ่มเติม (พร้อมการผูกตัดสต็อก)
