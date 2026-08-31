@@ -44,7 +44,6 @@ import {
   Ban,
 } from "lucide-react";
 
-// --- Master Initial Data ---
 const initialCategories = [
   { id: "all", name: "ทั้งหมด" },
   {
@@ -79,176 +78,6 @@ const initialCategories = [
   },
 ];
 
-const initialIngredients = [
-  {
-    id: "ing_beans",
-    name: "เมล็ดกาแฟ Special Blend",
-    stock: 2500,
-    unit: "กรัม",
-    minStock: 500,
-  },
-  {
-    id: "ing_milk",
-    name: "นมสดเมจิ พาสเจอร์ไรส์",
-    stock: 6000,
-    unit: "มล.",
-    minStock: 1000,
-  },
-  {
-    id: "ing_oat_milk",
-    name: "Oatly Oat Milk",
-    stock: 3000,
-    unit: "มล.",
-    minStock: 500,
-  },
-  {
-    id: "ing_matcha",
-    name: "ผงมัทฉะอุจิเกรดพิธีการ",
-    stock: 800,
-    unit: "กรัม",
-    minStock: 200,
-  },
-  {
-    id: "ing_syrup",
-    name: "ไซรัปกลิ่นวานิลลา",
-    stock: 1200,
-    unit: "มล.",
-    minStock: 200,
-  },
-  {
-    id: "ing_cups",
-    name: "แก้ว Warm Craft 16oz",
-    stock: 150,
-    unit: "ใบ",
-    minStock: 30,
-  },
-];
-
-const initialMenuItems = [
-  {
-    id: 1,
-    category: "coffee",
-    subCategory: "iced",
-    name: "Matcha Espresso Latte",
-    price: 120,
-    image: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400",
-    inStock: true,
-    sweetnessOptions: ["100%", "50%", "0%"],
-    milkOptions: [
-      {
-        id: "fresh",
-        label: "นมสดธรรมดา",
-        price: 0,
-        ingId: "ing_milk",
-        amount: 150,
-      },
-      {
-        id: "oat",
-        label: "นมโอ๊ต (Oat Milk)",
-        price: 20,
-        ingId: "ing_oat_milk",
-        amount: 150,
-      },
-    ],
-    addons: [
-      {
-        id: "shot",
-        label: "เพิ่ม Shot กาแฟ",
-        price: 25,
-        ingId: "ing_beans",
-        amount: 9,
-      },
-      {
-        id: "syrup",
-        label: "เพิ่ม ไซรัปวานิลลา",
-        price: 15,
-        ingId: "ing_syrup",
-        amount: 15,
-      },
-    ],
-    recipe: [
-      { ingId: "ing_beans", amount: 18 },
-      { ingId: "ing_matcha", amount: 10 },
-      { ingId: "ing_cups", amount: 1 },
-    ],
-  },
-  {
-    id: 2,
-    category: "coffee",
-    subCategory: "iced",
-    name: "Iced Americano",
-    price: 85,
-    image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=400",
-    inStock: true,
-    sweetnessOptions: ["100%", "50%", "0%"],
-    milkOptions: [],
-    addons: [
-      {
-        id: "shot",
-        label: "เพิ่ม Shot กาแฟ",
-        price: 25,
-        ingId: "ing_beans",
-        amount: 9,
-      },
-    ],
-    recipe: [
-      { ingId: "ing_beans", amount: 18 },
-      { ingId: "ing_cups", amount: 1 },
-    ],
-  },
-  {
-    id: 3,
-    category: "bakery",
-    subCategory: "croissant",
-    name: "French Butter Croissant",
-    price: 75,
-    image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400",
-    inStock: true,
-    sweetnessOptions: [],
-    milkOptions: [],
-    addons: [{ id: "butter", label: "เนยฝรั่งเศสแท้", price: 15 }],
-    recipe: [],
-  },
-];
-
-const initialPromotions = [
-  {
-    id: "p1",
-    code: "WELCOME10",
-    name: "ส่วนลดต้อนรับสมาชิก",
-    type: "percent",
-    value: 10,
-    minSpend: 100,
-    active: true,
-  },
-  {
-    id: "p2",
-    code: "COFFEE20",
-    name: "ส่วนลดพิเศษสายกาแฟ",
-    type: "fixed",
-    value: 20,
-    minSpend: 150,
-    active: true,
-  },
-];
-
-const initialExpenses = [
-  {
-    id: "e1",
-    title: "ซื้อเมล็ดกาแฟ Special Blend 5kg",
-    category: "raw_material",
-    amount: 2500,
-    date: new Date().toISOString().split("T")[0],
-  },
-  {
-    id: "e2",
-    title: "เครื่องบดกาแฟสำรอง",
-    category: "equipment",
-    amount: 4500,
-    date: new Date().toISOString().split("T")[0],
-  },
-];
-
 export default function App() {
   const [activeTab, setActiveTab] = useState("pos");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -257,13 +86,13 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [menuItems, setMenuItems] = useState([]);
-  const [ingredients, setIngredients] = useState(initialIngredients);
+  const [ingredients, setIngredients] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
   const [kitchenOrders, setKitchenOrders] = useState([]);
   const [orderQueueCount, setOrderQueueCount] = useState(1);
 
-  const [promotions, setPromotions] = useState(initialPromotions);
-  const [expenses, setExpenses] = useState(initialExpenses);
+  const [promotions, setPromotions] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [selectedPromo, setSelectedPromo] = useState(null);
 
   const todayObj = new Date();
@@ -271,18 +100,26 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState(todayObj.getMonth());
   const [selectedDay, setSelectedDay] = useState(String(todayObj.getDate()));
 
-  // 🔄 🔥 Supabase Fetch & Realtime Subscription
+  // 🔄 🔥 Supabase Fetch All Data & Realtime Syncing
   const fetchAllData = async () => {
     try {
       // 1. Fetch Menu Items
       const { data: menuData } = await supabase.from("menu_items").select("*");
-      if (menuData && menuData.length > 0) {
-        setMenuItems(menuData);
-      } else {
-        setMenuItems(initialMenuItems);
-      }
+      if (menuData) setMenuItems(menuData);
 
-      // 2. Fetch Orders
+      // 2. Fetch Ingredients
+      const { data: ingData } = await supabase.from("ingredients").select("*");
+      if (ingData) setIngredients(ingData);
+
+      // 3. Fetch Promotions
+      const { data: promoData } = await supabase.from("promotions").select("*");
+      if (promoData) setPromotions(promoData);
+
+      // 4. Fetch Expenses
+      const { data: expData } = await supabase.from("expenses").select("*").order("date", { ascending: false });
+      if (expData) setExpenses(expData);
+
+      // 5. Fetch Orders
       const { data: ordersData } = await supabase
         .from("orders")
         .select("*")
@@ -323,16 +160,14 @@ export default function App() {
   useEffect(() => {
     fetchAllData();
 
-    // 📡 เปิดใช้งาน Realtime Listener ให้ Sync ข้ามเครื่อง
+    // 📡 เปิดใช้งาน Realtime Listener ให้ Sync ข้ามเครื่องทุกตาราง
     const channel = supabase
-      .channel("realtime-orders-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        () => {
-          fetchAllData();
-        }
-      )
+      .channel("pos-realtime-channel")
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => fetchAllData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "ingredients" }, () => fetchAllData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, () => fetchAllData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "promotions" }, () => fetchAllData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" }, () => fetchAllData())
       .subscribe();
 
     return () => {
@@ -551,59 +386,40 @@ export default function App() {
   const total = Math.max(0, subtotal - effectiveDiscount);
   const vat = (total * 7) / 107;
 
-  // 🔥 ฟังก์ชันหักสต็อกวัตถุดิบ (เรียกเมื่อกด "ทำเสร็จสิ้น" ในครัว)
-  const deductInventoryStock = (cartItems) => {
-    setIngredients((prevIngs) => {
-      const updated = [...prevIngs];
-      cartItems.forEach((cartItem) => {
-        const qty = cartItem.qty;
+  // 🔥 ฟังก์ชันหักสต็อกวัตถุดิบลง Supabase จริงเมื่อกด "ทำเสร็จสิ้น"
+  const deductInventoryStock = async (cartItems) => {
+    const stockDeductions = {};
 
-        if (cartItem.recipe) {
-          cartItem.recipe.forEach((r) => {
-            const idx = updated.findIndex((i) => i.id === r.ingId);
-            if (idx !== -1) {
-              updated[idx] = {
-                ...updated[idx],
-                stock: Math.max(0, updated[idx].stock - r.amount * qty),
-              };
-            }
-          });
-        }
+    cartItems.forEach((cartItem) => {
+      const qty = cartItem.qty;
 
-        if (cartItem.selectedMilk && cartItem.selectedMilk.ingId) {
-          const idx = updated.findIndex(
-            (i) => i.id === cartItem.selectedMilk.ingId
-          );
-          if (idx !== -1) {
-            updated[idx] = {
-              ...updated[idx],
-              stock: Math.max(
-                0,
-                updated[idx].stock - cartItem.selectedMilk.amount * qty
-              ),
-            };
+      if (cartItem.recipe) {
+        cartItem.recipe.forEach((r) => {
+          stockDeductions[r.ingId] = (stockDeductions[r.ingId] || 0) + r.amount * qty;
+        });
+      }
+
+      if (cartItem.selectedMilk && cartItem.selectedMilk.ingId) {
+        const ingId = cartItem.selectedMilk.ingId;
+        stockDeductions[ingId] = (stockDeductions[ingId] || 0) + cartItem.selectedMilk.amount * qty;
+      }
+
+      if (cartItem.selectedAddonsList) {
+        cartItem.selectedAddonsList.forEach((addon) => {
+          if (addon.ingId && addon.amount) {
+            stockDeductions[addon.ingId] = (stockDeductions[addon.ingId] || 0) + addon.amount * qty;
           }
-        }
-
-        if (cartItem.selectedAddonsList && cartItem.selectedAddonsList.length > 0) {
-          cartItem.selectedAddonsList.forEach((addon) => {
-            if (addon.ingId && addon.amount) {
-              const idx = updated.findIndex((i) => i.id === addon.ingId);
-              if (idx !== -1) {
-                updated[idx] = {
-                  ...updated[idx],
-                  stock: Math.max(
-                    0,
-                    updated[idx].stock - addon.amount * qty
-                  ),
-                };
-              }
-            }
-          });
-        }
-      });
-      return updated;
+        });
+      }
     });
+
+    for (const [ingId, amountToDeduct] of Object.entries(stockDeductions)) {
+      const currentIng = ingredients.find((i) => i.id === ingId);
+      if (currentIng) {
+        const newStock = Math.max(0, currentIng.stock - amountToDeduct);
+        await supabase.from("ingredients").update({ stock: newStock }).eq("id", ingId);
+      }
+    }
   };
 
   const handleProcessPayment = async () => {
@@ -623,6 +439,7 @@ export default function App() {
 
     try {
       await supabase.from("orders").insert([newOrderPayload]);
+      fetchAllData();
     } catch (err) {
       console.error("Failed to save order to Supabase:", err);
     }
@@ -634,16 +451,16 @@ export default function App() {
     setSelectedPromo(null);
   };
 
-  // 🔥 อัปเดตสถานะออเดอร์ (รองรับ Supabase Sync + ลบโดยไม่คิดเงิน/ไม่ตัดสต็อก)
   const handleUpdateOrderStatus = async (orderId, nextStatus) => {
     const targetOrder = kitchenOrders.find((o) => o.id === orderId);
 
     if (nextStatus === "completed") {
       if (targetOrder) {
-        deductInventoryStock(targetOrder.items);
+        await deductInventoryStock(targetOrder.items);
       }
       try {
         await supabase.from("orders").update({ status: "completed" }).eq("id", orderId);
+        fetchAllData();
       } catch (err) {
         console.error("Failed to update status in Supabase:", err);
       }
@@ -655,6 +472,7 @@ export default function App() {
       ) {
         try {
           await supabase.from("orders").update({ status: "cancelled" }).eq("id", orderId);
+          fetchAllData();
         } catch (err) {
           console.error("Failed to cancel order in Supabase:", err);
         }
@@ -662,13 +480,15 @@ export default function App() {
     } else {
       try {
         await supabase.from("orders").update({ status: nextStatus }).eq("id", orderId);
+        fetchAllData();
       } catch (err) {
         console.error("Failed to update status in Supabase:", err);
       }
     }
   };
 
-  const handleSaveIngredient = (e) => {
+  // 🔥 จัดการวัตถุดิบ Supabase
+  const handleSaveIngredient = async (e) => {
     e.preventDefault();
     if (!ingForm.name || !ingForm.stock) return;
 
@@ -677,20 +497,44 @@ export default function App() {
       name: ingForm.name,
       stock: Number(ingForm.stock),
       unit: ingForm.unit,
-      minStock: Number(ingForm.minStock) || 100,
+      min_stock: Number(ingForm.minStock) || 100,
     };
 
-    setIngredients((prev) => [...prev, newIng]);
+    try {
+      await supabase.from("ingredients").insert([newIng]);
+      fetchAllData();
+    } catch (err) {
+      console.error("Failed to save ingredient:", err);
+    }
+
     setIngForm({ name: "", stock: "", unit: "กรัม", minStock: "" });
   };
 
-  const handleDeleteIngredient = (id) => {
-    if (confirm("คุณต้องการลบวัตถุดิบรายการนี้ใช่หรือไม่?")) {
-      setIngredients((prev) => prev.filter((i) => i.id !== id));
+  const handleAddIngredientStock = async (ingId, currentStock, ingName, unit) => {
+    const addAmount = Number(prompt(`เติมจำนวน ${ingName} (${unit}):`, "1000"));
+    if (addAmount) {
+      try {
+        await supabase.from("ingredients").update({ stock: currentStock + addAmount }).eq("id", ingId);
+        fetchAllData();
+      } catch (err) {
+        console.error("Failed to update stock:", err);
+      }
     }
   };
 
-  const handleSavePromotion = (e) => {
+  const handleDeleteIngredient = async (id) => {
+    if (confirm("คุณต้องการลบวัตถุดิบรายการนี้ใช่หรือไม่?")) {
+      try {
+        await supabase.from("ingredients").delete().eq("id", id);
+        fetchAllData();
+      } catch (err) {
+        console.error("Failed to delete ingredient:", err);
+      }
+    }
+  };
+
+  // 🔥 จัดการโปรโมชั่น Supabase
+  const handleSavePromotion = async (e) => {
     e.preventDefault();
     if (!promoForm.code || !promoForm.value) return;
 
@@ -700,33 +544,42 @@ export default function App() {
       name: promoForm.name,
       type: promoForm.type,
       value: Number(promoForm.value),
-      minSpend: Number(promoForm.minSpend) || 0,
+      min_spend: Number(promoForm.minSpend) || 0,
       active: true,
     };
 
-    setPromotions((prev) => [...prev, newPromo]);
-    setPromoForm({
-      code: "",
-      name: "",
-      type: "percent",
-      value: "",
-      minSpend: "",
-    });
+    try {
+      await supabase.from("promotions").insert([newPromo]);
+      fetchAllData();
+    } catch (err) {
+      console.error("Failed to save promotion:", err);
+    }
+
+    setPromoForm({ code: "", name: "", type: "percent", value: "", minSpend: "" });
   };
 
-  const togglePromotionStatus = (id) => {
-    setPromotions((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, active: !p.active } : p))
-    );
-  };
-
-  const handleDeletePromotion = (id) => {
-    if (confirm("คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?")) {
-      setPromotions((prev) => prev.filter((p) => p.id !== id));
+  const togglePromotionStatus = async (id, currentStatus) => {
+    try {
+      await supabase.from("promotions").update({ active: !currentStatus }).eq("id", id);
+      fetchAllData();
+    } catch (err) {
+      console.error("Failed to toggle promotion status:", err);
     }
   };
 
-  const handleSaveExpense = (e) => {
+  const handleDeletePromotion = async (id) => {
+    if (confirm("คุณต้องการลบโปรโมชั่นนี้ใช่หรือไม่?")) {
+      try {
+        await supabase.from("promotions").delete().eq("id", id);
+        fetchAllData();
+      } catch (err) {
+        console.error("Failed to delete promotion:", err);
+      }
+    }
+  };
+
+  // 🔥 จัดการรายจ่าย Supabase
+  const handleSaveExpense = async (e) => {
     e.preventDefault();
     if (!expenseForm.title || !expenseForm.amount) return;
 
@@ -738,7 +591,13 @@ export default function App() {
       date: expenseForm.date,
     };
 
-    setExpenses((prev) => [newExp, ...prev]);
+    try {
+      await supabase.from("expenses").insert([newExp]);
+      fetchAllData();
+    } catch (err) {
+      console.error("Failed to save expense:", err);
+    }
+
     setExpenseForm({
       title: "",
       category: "raw_material",
@@ -747,9 +606,14 @@ export default function App() {
     });
   };
 
-  const handleDeleteExpense = (id) => {
+  const handleDeleteExpense = async (id) => {
     if (confirm("คุณต้องการลบรายการนี้ใช่หรือไม่?")) {
-      setExpenses((prev) => prev.filter((e) => e.id !== id));
+      try {
+        await supabase.from("expenses").delete().eq("id", id);
+        fetchAllData();
+      } catch (err) {
+        console.error("Failed to delete expense:", err);
+      }
     }
   };
 
@@ -883,13 +747,13 @@ export default function App() {
       name: itemForm.name,
       price: Number(itemForm.price),
       category: itemForm.category,
-      subCategory: itemForm.subCategory,
+      sub_category: itemForm.subCategory,
       image:
         itemForm.image ||
         "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400",
-      inStock: itemForm.inStock,
-      sweetnessOptions,
-      milkOptions,
+      in_stock: itemForm.inStock,
+      sweetness_options: sweetnessOptions,
+      milk_options: milkOptions,
       addons,
       recipe: itemForm.recipe || [],
     };
@@ -926,14 +790,14 @@ export default function App() {
       name: item.name,
       price: item.price,
       category: item.category,
-      subCategory: item.subCategory || "all",
+      subCategory: item.sub_category || item.subCategory || "all",
       image: item.image,
-      inStock: item.inStock ?? true,
-      sweetnessText: item.sweetnessOptions
-        ? item.sweetnessOptions.join(", ")
+      inStock: item.in_stock ?? item.inStock ?? true,
+      sweetnessText: (item.sweetness_options || item.sweetnessOptions)
+        ? (item.sweetness_options || item.sweetnessOptions).join(", ")
         : "",
-      milkText: item.milkOptions
-        ? item.milkOptions.map((m) => `${m.label} (+${m.price})`).join(", ")
+      milkText: (item.milk_options || item.milkOptions)
+        ? (item.milk_options || item.milkOptions).map((m) => `${m.label} (+${m.price})`).join(", ")
         : "",
       addonsText: item.addons
         ? item.addons
@@ -988,7 +852,6 @@ export default function App() {
     return isYearMatch && isMonthMatch && isDayMatch;
   };
 
-  // 🔥 คัดออเดอร์ที่ไม่โดนยกเลิกมาคำนวณยอดขาย
   const validOrderHistory = orderHistory.filter((o) => o.status !== "cancelled");
   const filteredDashboardOrders = validOrderHistory.filter(isOrderInSelectedRange);
   const filteredDashboardExpenses = expenses.filter(isExpenseInSelectedRange);
@@ -1157,8 +1020,9 @@ export default function App() {
   const adminSelectedCategoryObj = initialCategories.find(c => c.id === itemForm.category);
 
   const filteredItems = menuItems.filter((item) => {
+    const subCat = item.sub_category || item.subCategory;
     const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
-    const matchesSubCategory = selectedSubCategory === "all" || !selectedSubCategory || item.subCategory === selectedSubCategory;
+    const matchesSubCategory = selectedSubCategory === "all" || !selectedSubCategory || subCat === selectedSubCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSubCategory && matchesSearch;
   });
@@ -1356,7 +1220,7 @@ export default function App() {
                     >
                       {!inStock && (
                         <span className="absolute top-3 right-3 bg-[#E07A5F] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full z-10 shadow-md uppercase tracking-wider">
-                          {!item.inStock ? "สินค้าหมด" : "วัตถุดิบหมด"}
+                          {!(item.in_stock ?? item.inStock) ? "สินค้าหมด" : "วัตถุดิบหมด"}
                         </span>
                       )}
 
@@ -1375,7 +1239,7 @@ export default function App() {
                         </h3>
                         <div className="flex justify-between items-center mt-2.5">
                           <p className="text-[#B08968] font-black text-base">
-                            ฿{item.price.toFixed(2)}
+                            ฿{Number(item.price).toFixed(2)}
                           </p>
                           <span className="w-7 h-7 bg-[#F5EFE6] text-[#B08968] group-hover:bg-[#B08968] group-hover:text-white rounded-xl flex items-center justify-center transition duration-300 shadow-xs">
                             <Plus size={14} />
@@ -1480,20 +1344,23 @@ export default function App() {
                     <option value="">-- ไม่ใช้โปรโมชั่น --</option>
                     {promotions
                       .filter((p) => p.active)
-                      .map((p) => (
-                        <option
-                          key={p.id}
-                          value={p.id}
-                          disabled={subtotal < p.minSpend}
-                        >
-                          {p.code} - {p.name} (
-                          {p.type === "percent" ? `${p.value}%` : `฿${p.value}`}
-                          )
-                          {subtotal < p.minSpend
-                            ? ` [ขั้นต่ำ ฿${p.minSpend}]`
-                            : ""}
-                        </option>
-                      ))}
+                      .map((p) => {
+                        const minSpend = p.min_spend ?? p.minSpend ?? 0;
+                        return (
+                          <option
+                            key={p.id}
+                            value={p.id}
+                            disabled={subtotal < minSpend}
+                          >
+                            {p.code} - {p.name} (
+                            {p.type === "percent" ? `${p.value}%` : `฿${p.value}`}
+                            )
+                            {subtotal < minSpend
+                              ? ` [ขั้นต่ำ ฿${minSpend}]`
+                              : ""}
+                          </option>
+                        );
+                      })}
                   </select>
                 </div>
               )}
@@ -1723,7 +1590,6 @@ export default function App() {
                       )}
                     </div>
 
-                    {/* 🔥 ปุ่มการทำงานในครัว (เริ่มทำ / ทำเสร็จสิ้น / ยกเลิกออเดอร์) */}
                     <div className="p-3.5 bg-[#1C1614] border-t border-[#2C231F] shrink-0 space-y-2">
                       {order.status === "pending" ? (
                         <button
@@ -1745,7 +1611,6 @@ export default function App() {
                         </button>
                       )}
 
-                      {/* 🔥 ปุ่มยกเลิกสินค้า (ไม่นำไปคิดยอดขาย & ไม่ตัดสต็อก) */}
                       <button
                         onClick={() =>
                           handleUpdateOrderStatus(order.id, "cancelled")
@@ -2770,6 +2635,7 @@ export default function App() {
                     <tbody className="divide-y divide-[#F5EFE6]">
                       {menuItems.map((item) => {
                         const inStock = isItemInStock(item);
+                        const subCat = item.sub_category || item.subCategory;
                         return (
                           <tr
                             key={item.id}
@@ -2789,9 +2655,9 @@ export default function App() {
                             </td>
                             <td className="py-3.5 text-[#8C7E75]">
                               <span className="capitalize font-bold text-[#2C221E]">{item.category}</span>
-                              {item.subCategory && item.subCategory !== "all" && (
+                              {subCat && subCat !== "all" && (
                                 <span className="text-[10px] bg-[#F5EFE6] text-[#8C6239] px-2 py-0.5 rounded-md ml-1.5 font-bold uppercase">
-                                  {item.subCategory}
+                                  {subCat}
                                 </span>
                               )}
                             </td>
@@ -2803,12 +2669,12 @@ export default function App() {
                               ) : (
                                 <span className="text-[11px] text-[#E07A5F] bg-[#FDF4F2] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#FADCD6]">
                                   <XCircle size={12} />{" "}
-                                  {!item.inStock ? "ปิดขาย" : "วัตถุดิบหมด"}
+                                  {!(item.in_stock ?? item.inStock) ? "ปิดขาย" : "วัตถุดิบหมด"}
                                 </span>
                               )}
                             </td>
                             <td className="py-3.5 font-black text-[#B08968]">
-                              ฿{item.price.toFixed(2)}
+                              ฿{Number(item.price).toFixed(2)}
                             </td>
                             <td className="py-3.5 text-right space-x-2">
                               <button
@@ -2924,7 +2790,8 @@ export default function App() {
                 </h2>
                 <div className="space-y-3">
                   {ingredients.map((ing) => {
-                    const isLow = ing.stock <= ing.minStock;
+                    const minStock = ing.min_stock ?? ing.minStock ?? 0;
+                    const isLow = ing.stock <= minStock;
                     return (
                       <div
                         key={ing.id}
@@ -2946,28 +2813,12 @@ export default function App() {
                             <span className="font-black text-[#B08968]">
                               {ing.stock}
                             </span>{" "}
-                            {ing.unit} (ขั้นต่ำ: {ing.minStock} {ing.unit})
+                            {ing.unit} (ขั้นต่ำ: {minStock} {ing.unit})
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <button
-                            onClick={() => {
-                              const addAmount = Number(
-                                prompt(
-                                  `เติมจำนวน ${ing.name} (${ing.unit}):`,
-                                  "1000"
-                                )
-                              );
-                              if (addAmount) {
-                                setIngredients((prev) =>
-                                  prev.map((i) =>
-                                    i.id === ing.id
-                                      ? { ...i, stock: i.stock + addAmount }
-                                      : i
-                                  )
-                                );
-                              }
-                            }}
+                            onClick={() => handleAddIngredientStock(ing.id, ing.stock, ing.name, ing.unit)}
                             className="bg-[#B08968] hover:bg-[#8C6239] text-white px-3.5 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition"
                           >
                             + เติมสต็อก
@@ -3087,50 +2938,53 @@ export default function App() {
                   รายการโปรโมชั่นทั้งหมด ({promotions.length} รายการ)
                 </h2>
                 <div className="space-y-3">
-                  {promotions.map((p) => (
-                    <div
-                      key={p.id}
-                      className="p-4 bg-[#FBF9F6] border border-[#F5EFE6] rounded-2xl flex justify-between items-center"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-black text-xs bg-[#2C221E] text-white px-3 py-0.5 rounded-lg tracking-wider">
-                            {p.code}
-                          </span>
-                          <span className="font-bold text-xs text-[#2C221E]">
-                            {p.name}
-                          </span>
+                  {promotions.map((p) => {
+                    const minSpend = p.min_spend ?? p.minSpend ?? 0;
+                    return (
+                      <div
+                        key={p.id}
+                        className="p-4 bg-[#FBF9F6] border border-[#F5EFE6] rounded-2xl flex justify-between items-center"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-xs bg-[#2C221E] text-white px-3 py-0.5 rounded-lg tracking-wider">
+                              {p.code}
+                            </span>
+                            <span className="font-bold text-xs text-[#2C221E]">
+                              {p.name}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#8C7E75] font-medium mt-1">
+                            ส่วนลด:{" "}
+                            <span className="font-black text-[#B08968]">
+                              {p.type === "percent"
+                                ? `${p.value}%`
+                                : `฿${p.value}`}
+                            </span>{" "}
+                            • ยอดซื้อขั้นต่ำ: ฿{minSpend}
+                          </p>
                         </div>
-                        <p className="text-xs text-[#8C7E75] font-medium mt-1">
-                          ส่วนลด:{" "}
-                          <span className="font-black text-[#B08968]">
-                            {p.type === "percent"
-                              ? `${p.value}%`
-                              : `฿${p.value}`}
-                          </span>{" "}
-                          • ยอดซื้อขั้นต่ำ: ฿{p.minSpend}
-                        </p>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => togglePromotionStatus(p.id, p.active)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition ${
+                              p.active
+                                ? "bg-[#EAF4ED] text-[#2E6F40]"
+                                : "bg-[#FDF4F2] text-[#E07A5F]"
+                            }`}
+                          >
+                            {p.active ? "เปิดใช้งานอยู่" : "ปิดใช้งาน"}
+                          </button>
+                          <button
+                            onClick={() => handleDeletePromotion(p.id)}
+                            className="p-2 text-[#E07A5F] hover:bg-[#FDF4F2] rounded-xl cursor-pointer"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => togglePromotionStatus(p.id)}
-                          className={`px-3 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition ${
-                            p.active
-                              ? "bg-[#EAF4ED] text-[#2E6F40]"
-                              : "bg-[#FDF4F2] text-[#E07A5F]"
-                          }`}
-                        >
-                          {p.active ? "เปิดใช้งานอยู่" : "ปิดใช้งาน"}
-                        </button>
-                        <button
-                          onClick={() => handleDeletePromotion(p.id)}
-                          className="p-2 text-[#E07A5F] hover:bg-[#FDF4F2] rounded-xl cursor-pointer"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -3269,7 +3123,7 @@ export default function App() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-black text-sm text-[#E07A5F]">
-                          -฿{e.amount.toFixed(2)}
+                          -฿{Number(e.amount).toFixed(2)}
                         </span>
                         <button
                           onClick={() => handleDeleteExpense(e.id)}
@@ -3489,13 +3343,13 @@ export default function App() {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6 text-xs custom-scrollbar">
-              {selectedItemForCustom.sweetnessOptions?.length > 0 && (
+              {(selectedItemForCustom.sweetness_options || selectedItemForCustom.sweetnessOptions)?.length > 0 && (
                 <div>
                   <label className="font-black text-[#8C7E75] text-[11px] uppercase tracking-wider block mb-2.5">
                     ระดับความหวาน
                   </label>
                   <div className="grid grid-cols-3 gap-2.5">
-                    {selectedItemForCustom.sweetnessOptions.map((sw) => (
+                    {(selectedItemForCustom.sweetness_options || selectedItemForCustom.sweetnessOptions).map((sw) => (
                       <button
                         key={sw}
                         onClick={() => setSweetness(sw)}
@@ -3508,13 +3362,13 @@ export default function App() {
                 </div>
               )}
 
-              {selectedItemForCustom.milkOptions?.length > 0 && (
+              {(selectedItemForCustom.milk_options || selectedItemForCustom.milkOptions)?.length > 0 && (
                 <div>
                   <label className="font-black text-[#8C7E75] text-[11px] uppercase tracking-wider block mb-2.5">
                     ตัวเลือกนม (Milk)
                   </label>
                   <div className="space-y-2">
-                    {selectedItemForCustom.milkOptions.map((m) => (
+                    {(selectedItemForCustom.milk_options || selectedItemForCustom.milkOptions).map((m) => (
                       <button
                         key={m.id}
                         onClick={() => setMilk(m)}
@@ -3663,7 +3517,7 @@ export default function App() {
                   <span>-฿{activeReceipt.discount.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between font-black text-sm pt-1.5 text-[#2C221E]">
+              <div className="flex justify-between font-[#2C221E] font-black text-sm pt-1.5">
                 <span>ยอดรวมสุทธิ (รวม VAT):</span>{" "}
                 <span className="text-[#B08968]">
                   ฿{activeReceipt.total.toFixed(2)}
