@@ -1794,14 +1794,16 @@ export default function App() {
                 {Array.from({ length: daysInSelectedMonth }, (_, i) => i + 1).map((d) => (
                   <option key={d} value={d}>วันที่ {d}</option>
                 ))}
-              </select>
 
-              <button
+                <button
                 onClick={() => setIsShiftCloseOpen(true)}
                 className="bg-[#800020] hover:bg-[#5C0017] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer ml-1"
               >
                 <Receipt size={16} /> สรุปยอดปิดกะประจำวัน
               </button>
+              </select>
+
+              
             </div>
           </div>
 
