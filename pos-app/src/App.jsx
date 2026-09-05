@@ -1129,7 +1129,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#FAF7F2] text-[#2D2422] font-sans antialiased overflow-hidden selection:bg-[#800020] selection:text-white">
-      {/* Sidebar Navigation - Deep Maroon & Slate Grey Mix */}
+      {/* Sidebar Navigation */}
       <aside className="w-22 bg-gradient-to-b from-[#4A0013] via-[#1E293B] to-[#0F172A] flex flex-col items-center py-7 justify-between text-[#FAF7F2] z-30 shrink-0 shadow-2xl border-r border-[#800020]/30">
         <div className="flex flex-col items-center gap-9 w-full px-3">
           <div className="relative group cursor-pointer">
@@ -1508,7 +1508,7 @@ export default function App() {
         </>
       )}
 
-      {/* Kitchen Display Screen - Slate Grey & Deep Burgundy accent */}
+      {/* Kitchen Display Screen */}
       {activeTab === "kitchen" && (
         <main className="flex-1 p-8 bg-[#0F172A] text-white overflow-y-auto custom-scrollbar">
           <div className="flex justify-between items-center mb-8 border-b border-[#334155] pb-5">
@@ -1757,6 +1757,7 @@ export default function App() {
               </p>
             </div>
 
+            {/* 🎯 จัดการ Layout ปุ่มเรียงเป็นแถวเดียวสวยงาม */}
             <div className="flex items-center gap-2.5 flex-wrap">
               <button
                 onClick={handleResetToToday}
@@ -1794,16 +1795,15 @@ export default function App() {
                 {Array.from({ length: daysInSelectedMonth }, (_, i) => i + 1).map((d) => (
                   <option key={d} value={d}>วันที่ {d}</option>
                 ))}
+              </select>
 
-                <button
+              {/* 🎯 ปุ่มย้ายมาต่อท้ายช่องวันที่ตรงนี้เรียบร้อยครับ */}
+              <button
                 onClick={() => setIsShiftCloseOpen(true)}
-                className="bg-[#800020] hover:bg-[#5C0017] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer ml-1"
+                className="bg-[#800020] hover:bg-[#5C0017] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer"
               >
                 <Receipt size={16} /> สรุปยอดปิดกะประจำวัน
               </button>
-              </select>
-
-              
             </div>
           </div>
 
@@ -3517,7 +3517,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Shift Close Summary Modal - Today Only */}
+      {/* Shift Close Summary Modal */}
       {isShiftCloseOpen && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl border border-[#E2E8F0] animate-fadeIn relative overflow-hidden">
@@ -3599,7 +3599,6 @@ export default function App() {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6 text-xs custom-scrollbar">
-              {/* เลือกขนาดแก้ว (Size Selection) */}
               {selectedItemForCustom.sizes && selectedItemForCustom.sizes.length > 0 && (
                 <div>
                   <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
