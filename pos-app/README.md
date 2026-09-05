@@ -32,7 +32,7 @@ https://mvejstgsucdgunpahsyt.supabase.co  API_URL
 
 https://github.com/Jeerasak-pk/COE_CAFE-18.git ลิ้ง github
 
-git add .  เช็ก/เพิ่มไฟล์ที่แก้ไขเข้า Git Stage
+git add . เช็ก/เพิ่มไฟล์ที่แก้ไขเข้า Git Stage
 
 git commit -m "update App.jsx add ingredient mapping to toppings"  บันทึก Commit (ใส่ข้อความกำกับไว้หน่อยกันลืม)
 
