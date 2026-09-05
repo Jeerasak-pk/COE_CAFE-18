@@ -44,6 +44,7 @@ import {
   Ban,
   Cog,
   Cpu,
+  Maximize2,
 } from "lucide-react";
 
 const initialCategories = [
@@ -102,7 +103,7 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState(todayObj.getMonth());
   const [selectedDay, setSelectedDay] = useState(String(todayObj.getDate()));
 
-  // 🔄 🔥 Supabase Fetch All Data & Realtime Syncing
+  // 🔄 Supabase Fetch All Data & Realtime Syncing
   const fetchAllData = async () => {
     try {
       const { data: menuData } = await supabase.from("menu_items").select("*");
@@ -181,6 +182,7 @@ export default function App() {
   const MANAGEMENT_PIN = "1234";
 
   const [selectedItemForCustom, setSelectedItemForCustom] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("qr");
   const [orderType, setOrderType] = useState("Dine-in");
@@ -190,7 +192,9 @@ export default function App() {
   const [isShiftCloseOpen, setIsShiftCloseOpen] = useState(false);
   const [customDiscount, setCustomDiscount] = useState(0);
 
+  // Admin Item Form State
   const [editingItem, setEditingItem] = useState(null);
+  const [hasMultipleSizes, setHasMultipleSizes] = useState(false);
   const [itemForm, setItemForm] = useState({
     name: "",
     price: "",
@@ -202,7 +206,13 @@ export default function App() {
     milkText: "นมสดธรรมดา (+0), นมโอ๊ต (+20)",
     addonsText: "เพิ่ม Shot กาแฟ (+25), เพิ่ม ไซรัปวานิลลา (+15)",
     recipe: [],
+    sizes: [],
   });
+
+  // Admin Sizes State
+  const [newSizeName, setNewSizeName] = useState("");
+  const [newSizePrice, setNewSizePrice] = useState("");
+  const [selectedSizeIdxForRecipe, setSelectedSizeIdxForRecipe] = useState(0);
 
   const [selectedIngForRecipe, setSelectedIngForRecipe] = useState("");
   const [recipeIngAmount, setRecipeIngAmount] = useState("");
@@ -243,31 +253,29 @@ export default function App() {
   const [itemNote, setItemNote] = useState("");
   const [customQty, setCustomQty] = useState(1);
 
-  useEffect(() => {
-    setMenuItems((prevItems) =>
-      prevItems.map((item) => {
-        if (!item.recipe || item.recipe.length === 0) return item;
-
-        const hasEnoughIngredients = item.recipe.every((r) => {
-          const ing = ingredients.find((i) => i.id === r.ingId);
-          return ing && ing.stock >= r.amount;
-        });
-
-        if (item.inStock !== hasEnoughIngredients) {
-          return { ...item, inStock: hasEnoughIngredients };
-        }
-        return item;
-      })
-    );
-  }, [ingredients]);
-
-  const isItemInStock = (item) => {
-    if (!item.inStock) return false;
-    if (!item.recipe || item.recipe.length === 0) return true;
-    return item.recipe.every((r) => {
+  // Helper check stock for a specific recipe
+  const checkRecipeStock = (recipeList) => {
+    if (!recipeList || recipeList.length === 0) return true;
+    return recipeList.every((r) => {
       const ing = ingredients.find((i) => i.id === r.ingId);
       return ing && ing.stock >= r.amount;
     });
+  };
+
+  const isItemInStock = (item) => {
+    if (!(item.in_stock ?? item.inStock ?? true)) return false;
+
+    // Check if item has sizes
+    if (item.sizes && item.sizes.length > 0) {
+      return item.sizes.some((sz) => checkRecipeStock(sz.recipe));
+    }
+
+    return checkRecipeStock(item.recipe);
+  };
+
+  const isSizeInStock = (sizeObj, defaultRecipe = []) => {
+    const targetRecipe = sizeObj?.recipe || defaultRecipe;
+    return checkRecipeStock(targetRecipe);
   };
 
   const handleProtectedTabClick = (tabName) => {
@@ -302,28 +310,39 @@ export default function App() {
   const handleItemClick = (item) => {
     if (!isItemInStock(item)) return;
     setSelectedItemForCustom(item);
-    setSweetness(item.sweetnessOptions?.[0] || "100%");
-    setMilk(item.milkOptions?.[0] || null);
+
+    const availableSizes = item.sizes || [];
+    if (availableSizes.length > 0) {
+      const defaultInStockSize = availableSizes.find((sz) => isSizeInStock(sz, item.recipe)) || availableSizes[0];
+      setSelectedSize(defaultInStockSize);
+    } else {
+      setSelectedSize(null);
+    }
+
+    const swOpts = item.sweetness_options || item.sweetnessOptions || [];
+    const milkOpts = item.milk_options || item.milkOptions || [];
+
+    setSweetness(swOpts[0] || "100%");
+    setMilk(milkOpts[0] || null);
     setSelectedAddons([]);
     setItemNote("");
     setCustomQty(1);
   };
 
   const handleAddCustomizedToCart = () => {
-    const milkPrice = milk ? milk.price : 0;
-    const addonPrice = selectedAddons.reduce(
-      (sum, addon) => sum + addon.price,
-      0
-    );
-    const unitPrice = selectedItemForCustom.price + milkPrice + addonPrice;
+    const basePrice = selectedSize ? Number(selectedSize.price) : Number(selectedItemForCustom.price);
+    const milkPrice = milk ? Number(milk.price) : 0;
+    const addonPrice = selectedAddons.reduce((sum, addon) => sum + Number(addon.price), 0);
+    const unitPrice = basePrice + milkPrice + addonPrice;
 
+    const sizeText = selectedSize ? selectedSize.name : "";
     const addonsLabel = selectedAddons.map((a) => a.label).join(", ");
     const milkLabel = milk ? milk.label : "";
-    const optionsText =
-      [sweetness, milkLabel, addonsLabel].filter(Boolean).join(" • ") || "ปกติ";
+    const optionsText = [sizeText, sweetness, milkLabel, addonsLabel].filter(Boolean).join(" • ") || "ปกติ";
     const noteText = itemNote.trim();
 
     const cartId = `${selectedItemForCustom.id}-${optionsText}-${noteText}`;
+    const activeRecipe = selectedSize?.recipe || selectedItemForCustom.recipe || [];
 
     setCart((prev) => {
       const existing = prev.find((i) => i.cartId === cartId);
@@ -341,6 +360,8 @@ export default function App() {
           noteText,
           unitPrice,
           qty: customQty,
+          selectedSize: selectedSize,
+          recipe: activeRecipe,
           selectedMilk: milk,
           selectedAddonsList: selectedAddons,
         },
@@ -609,29 +630,17 @@ export default function App() {
     }
   };
 
-  const handleAddIngToRecipe = () => {
-    if (
-      !selectedIngForRecipe ||
-      !recipeIngAmount ||
-      Number(recipeIngAmount) <= 0
-    )
-      return;
+  // Recipe Admin Handlers
+  const handleAddIngToSingleRecipe = () => {
+    if (!selectedIngForRecipe || !recipeIngAmount || Number(recipeIngAmount) <= 0) return;
 
     setItemForm((prev) => {
-      const existingIdx = prev.recipe.findIndex(
-        (r) => r.ingId === selectedIngForRecipe
-      );
+      const existingIdx = prev.recipe.findIndex((r) => r.ingId === selectedIngForRecipe);
       let updatedRecipe = [...prev.recipe];
       if (existingIdx !== -1) {
-        updatedRecipe[existingIdx] = {
-          ...updatedRecipe[existingIdx],
-          amount: Number(recipeIngAmount),
-        };
+        updatedRecipe[existingIdx] = { ...updatedRecipe[existingIdx], amount: Number(recipeIngAmount) };
       } else {
-        updatedRecipe.push({
-          ingId: selectedIngForRecipe,
-          amount: Number(recipeIngAmount),
-        });
+        updatedRecipe.push({ ingId: selectedIngForRecipe, amount: Number(recipeIngAmount) });
       }
       return { ...prev, recipe: updatedRecipe };
     });
@@ -640,11 +649,80 @@ export default function App() {
     setRecipeIngAmount("");
   };
 
-  const handleRemoveIngFromRecipe = (ingId) => {
+  const handleRemoveIngFromSingleRecipe = (ingId) => {
     setItemForm((prev) => ({
       ...prev,
       recipe: prev.recipe.filter((r) => r.ingId !== ingId),
     }));
+  };
+
+  // Multiple Sizes Admin Handlers
+  const handleAddNewSize = () => {
+    if (!newSizeName || !newSizePrice) return;
+
+    const newSizeObj = {
+      id: `size_${Date.now()}`,
+      name: newSizeName.trim(),
+      price: Number(newSizePrice),
+      recipe: [],
+    };
+
+    setItemForm((prev) => ({
+      ...prev,
+      sizes: [...(prev.sizes || []), newSizeObj],
+    }));
+
+    setNewSizeName("");
+    setNewSizePrice("");
+  };
+
+  const handleRemoveSize = (sizeIdx) => {
+    setItemForm((prev) => ({
+      ...prev,
+      sizes: prev.sizes.filter((_, idx) => idx !== sizeIdx),
+    }));
+    if (selectedSizeIdxForRecipe >= sizeIdx && selectedSizeIdxForRecipe > 0) {
+      setSelectedSizeIdxForRecipe(selectedSizeIdxForRecipe - 1);
+    }
+  };
+
+  const handleAddIngToSizeRecipe = () => {
+    if (!selectedIngForRecipe || !recipeIngAmount || Number(recipeIngAmount) <= 0) return;
+    if (!itemForm.sizes || itemForm.sizes.length === 0) return;
+
+    setItemForm((prev) => {
+      const updatedSizes = [...prev.sizes];
+      const targetSize = updatedSizes[selectedSizeIdxForRecipe];
+      if (!targetSize) return prev;
+
+      const sizeRecipe = targetSize.recipe || [];
+      const existingIdx = sizeRecipe.findIndex((r) => r.ingId === selectedIngForRecipe);
+      let updatedRecipe = [...sizeRecipe];
+
+      if (existingIdx !== -1) {
+        updatedRecipe[existingIdx] = { ...updatedRecipe[existingIdx], amount: Number(recipeIngAmount) };
+      } else {
+        updatedRecipe.push({ ingId: selectedIngForRecipe, amount: Number(recipeIngAmount) });
+      }
+
+      updatedSizes[selectedSizeIdxForRecipe] = { ...targetSize, recipe: updatedRecipe };
+      return { ...prev, sizes: updatedSizes };
+    });
+
+    setSelectedIngForRecipe("");
+    setRecipeIngAmount("");
+  };
+
+  const handleRemoveIngFromSizeRecipe = (sizeIdx, ingId) => {
+    setItemForm((prev) => {
+      const updatedSizes = [...prev.sizes];
+      const targetSize = updatedSizes[sizeIdx];
+      if (!targetSize) return prev;
+
+      const updatedRecipe = (targetSize.recipe || []).filter((r) => r.ingId !== ingId);
+      updatedSizes[sizeIdx] = { ...targetSize, recipe: updatedRecipe };
+      return { ...prev, sizes: updatedSizes };
+    });
   };
 
   const addSweetnessOption = () => {
@@ -693,7 +771,12 @@ export default function App() {
 
   const handleSaveItem = async (e) => {
     e.preventDefault();
-    if (!itemForm.name || !itemForm.price) return;
+    if (!itemForm.name) return;
+
+    let basePrice = Number(itemForm.price) || 0;
+    if (hasMultipleSizes && itemForm.sizes && itemForm.sizes.length > 0) {
+      basePrice = itemForm.sizes[0].price;
+    }
 
     const sweetnessOptions = itemForm.sweetnessText
       ? itemForm.sweetnessText.split(",").map((s) => s.trim()).filter(Boolean)
@@ -737,7 +820,7 @@ export default function App() {
 
     const itemPayload = {
       name: itemForm.name,
-      price: Number(itemForm.price),
+      price: basePrice,
       category: itemForm.category,
       sub_category: itemForm.subCategory,
       image:
@@ -747,7 +830,8 @@ export default function App() {
       sweetness_options: sweetnessOptions,
       milk_options: milkOptions,
       addons,
-      recipe: itemForm.recipe || [],
+      recipe: hasMultipleSizes ? [] : itemForm.recipe || [],
+      sizes: hasMultipleSizes ? itemForm.sizes || [] : [],
     };
 
     try {
@@ -762,6 +846,7 @@ export default function App() {
     }
 
     setEditingItem(null);
+    setHasMultipleSizes(false);
     setItemForm({
       name: "",
       price: "",
@@ -773,11 +858,15 @@ export default function App() {
       milkText: "นมสดธรรมดา (+0)",
       addonsText: "เพิ่ม Shot กาแฟ (+25)",
       recipe: [],
+      sizes: [],
     });
   };
 
   const handleEditClick = (item) => {
     setEditingItem(item);
+    const itemSizes = item.sizes || [];
+    setHasMultipleSizes(itemSizes.length > 0);
+
     setItemForm({
       name: item.name,
       price: item.price,
@@ -801,6 +890,7 @@ export default function App() {
             .join(", ")
         : "",
       recipe: item.recipe || [],
+      sizes: itemSizes,
     });
   };
 
@@ -1201,6 +1291,11 @@ export default function App() {
               <div className="grid grid-cols-3 gap-6 auto-rows-max pb-4">
                 {filteredItems.map((item) => {
                   const inStock = isItemInStock(item);
+                  const hasSizes = item.sizes && item.sizes.length > 0;
+                  const displayPrice = hasSizes
+                    ? `฿${item.sizes[0].price}+`
+                    : `฿${Number(item.price).toFixed(2)}`;
+
                   return (
                     <div
                       key={item.id}
@@ -1224,6 +1319,11 @@ export default function App() {
                           className="w-full h-full object-cover group-hover:scale-108 transition duration-700 ease-out"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                        {hasSizes && (
+                          <span className="absolute bottom-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg backdrop-blur-xs flex items-center gap-1">
+                            <Maximize2 size={10} /> {item.sizes.length} ขนาด
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex flex-col justify-between flex-1">
@@ -1232,7 +1332,7 @@ export default function App() {
                         </h3>
                         <div className="flex justify-between items-center mt-2.5">
                           <p className="text-[#800020] font-black text-base">
-                            ฿{Number(item.price).toFixed(2)}
+                            {displayPrice}
                           </p>
                           <span className="w-7 h-7 bg-[#F7F2F3] text-[#800020] group-hover:bg-[#800020] group-hover:text-white rounded-xl flex items-center justify-center transition duration-300 shadow-xs">
                             <Plus size={14} />
@@ -1403,7 +1503,7 @@ export default function App() {
                 </h1>
               </div>
               <p className="text-xs text-[#C2A3A9] mt-1 font-medium">
-                วัตถุดิบจะถูกตัดสต็อกจริงอัตโนมัติเมื่อกด "ทำเสร็จสิ้น" เท่านั้น
+                วัตถุดิบจะถูกตัดสต็อกจริงตามสูตรขนาดแก้วเมื่อกด "ทำเสร็จสิ้น" เท่านั้น
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -2189,21 +2289,6 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="font-extrabold text-[#4D3F42] block mb-1">
-                        ราคา (บาท)
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        value={itemForm.price}
-                        onChange={(e) =>
-                          setItemForm({ ...itemForm, price: e.target.value })
-                        }
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-black transition"
-                        placeholder="120"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
                         หมวดหมู่หลัก
                       </label>
                       <select
@@ -2225,30 +2310,136 @@ export default function App() {
                         <option value="bakery">Bakery</option>
                       </select>
                     </div>
+
+                    {adminSelectedCategoryObj?.subCategories && (
+                      <div>
+                        <label className="font-extrabold text-[#4D3F42] block mb-1">
+                          หมวดหมู่ย่อย
+                        </label>
+                        <select
+                          value={itemForm.subCategory}
+                          onChange={(e) =>
+                            setItemForm({ ...itemForm, subCategory: e.target.value })
+                          }
+                          className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-bold transition"
+                        >
+                          {adminSelectedCategoryObj.subCategories
+                            .filter((sub) => sub.id !== "all")
+                            .map((sub) => (
+                              <option key={sub.id} value={sub.id}>
+                                {sub.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
 
-                  {adminSelectedCategoryObj?.subCategories && (
-                    <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
-                        หมวดหมู่ย่อย (Sub-Category)
+                  {/* สลับรูปแบบราคา & ไซส์ */}
+                  <div className="bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] space-y-3">
+                    <div className="flex justify-between items-center">
+                      <label className="font-extrabold text-[#4D3F42]">
+                        การตั้งค่าขนาดแก้ว & ราคา
                       </label>
-                      <select
-                        value={itemForm.subCategory}
-                        onChange={(e) =>
-                          setItemForm({ ...itemForm, subCategory: e.target.value })
-                        }
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-bold transition"
+                      <button
+                        type="button"
+                        onClick={() => setHasMultipleSizes(!hasMultipleSizes)}
+                        className={`text-[11px] font-black px-3 py-1 rounded-xl transition cursor-pointer ${
+                          hasMultipleSizes
+                            ? "bg-[#800020] text-white"
+                            : "bg-[#E8DFE1] text-[#736366]"
+                        }`}
                       >
-                        {adminSelectedCategoryObj.subCategories
-                          .filter((sub) => sub.id !== "all")
-                          .map((sub) => (
-                            <option key={sub.id} value={sub.id}>
-                              {sub.name}
-                            </option>
-                          ))}
-                      </select>
+                        {hasMultipleSizes ? "มีหลายขนาดแก้ว" : "ขนาดเดียว (Standard)"}
+                      </button>
                     </div>
-                  )}
+
+                    {!hasMultipleSizes ? (
+                      <div>
+                        <label className="font-bold text-[#736366] block mb-1">
+                          ราคา (บาท)
+                        </label>
+                        <input
+                          type="number"
+                          required={!hasMultipleSizes}
+                          value={itemForm.price}
+                          onChange={(e) =>
+                            setItemForm({ ...itemForm, price: e.target.value })
+                          }
+                          className="w-full p-3 bg-white border border-[#E8DFE1] rounded-xl focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-black"
+                          placeholder="60"
+                        />
+                      </div>
+                    ) : (
+                      <div className="space-y-3 pt-1 border-t border-[#E8DFE1]">
+                        <div className="space-y-1.5">
+                          {itemForm.sizes && itemForm.sizes.length > 0 ? (
+                            itemForm.sizes.map((sz, idx) => (
+                              <div
+                                key={sz.id || idx}
+                                className={`p-2.5 rounded-xl border flex justify-between items-center transition cursor-pointer ${
+                                  selectedSizeIdxForRecipe === idx
+                                    ? "bg-white border-[#800020] shadow-xs"
+                                    : "bg-white/60 border-[#E8DFE1]"
+                                }`}
+                                onClick={() => setSelectedSizeIdxForRecipe(idx)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-xs text-[#1F1716]">
+                                    {sz.name}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-[#800020] bg-[#F7F2F3] px-2 py-0.5 rounded-md">
+                                    ฿{sz.price}
+                                  </span>
+                                  <span className="text-[10px] text-[#736366]">
+                                    ({sz.recipe?.length || 0} วัตถุดิบ)
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveSize(idx);
+                                  }}
+                                  className="text-[#A8989B] hover:text-[#D32F2F] p-1"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-[11px] text-[#A8989B] italic">
+                              ยังไม่ได้เพิ่มขนาดแก้ว
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <input
+                            type="text"
+                            value={newSizeName}
+                            onChange={(e) => setNewSizeName(e.target.value)}
+                            placeholder="เช่น 16 oz, 22 oz, Hot 8oz"
+                            className="p-2 bg-white border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                          />
+                          <input
+                            type="number"
+                            value={newSizePrice}
+                            onChange={(e) => setNewSizePrice(e.target.value)}
+                            placeholder="ราคา (เช่น 65)"
+                            className="p-2 bg-white border border-[#E8DFE1] rounded-lg text-xs outline-none font-black"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAddNewSize}
+                          className="w-full bg-[#800020] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#5B0015] transition"
+                        >
+                          + เพิ่มขนาดแก้วนี้
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <div>
                     <label className="font-extrabold text-[#4D3F42] block mb-1">
@@ -2287,42 +2478,76 @@ export default function App() {
                   {/* สูตรวัตถุดิบตัดสต็อก */}
                   <div className="bg-[#FCFAFA] p-4 rounded-2xl border border-[#E8DFE1] space-y-2.5">
                     <label className="font-extrabold text-[#4D3F42] block">
-                      สูตรวัตถุดิบตัดสต็อก (ต่อ 1 แก้ว)
+                      {hasMultipleSizes && itemForm.sizes?.length > 0
+                        ? `สูตรวัตถุดิบตัดสต็อกสำหรับขนาด [ ${itemForm.sizes[selectedSizeIdxForRecipe]?.name || ""} ]`
+                        : "สูตรวัตถุดิบตัดสต็อก (ต่อ 1 แก้ว)"}
                     </label>
 
                     <div className="space-y-2">
-                      {itemForm.recipe && itemForm.recipe.length > 0 ? (
-                        itemForm.recipe.map((r) => {
-                          const ing = ingredients.find((i) => i.id === r.ingId);
-                          return (
-                            <div
-                              key={r.ingId}
-                              className="flex justify-between items-center bg-white border border-[#E8DFE1] px-3 py-2 rounded-xl"
-                            >
-                              <span className="font-bold text-[#1F1716]">
-                                {ing ? ing.name : r.ingId}
-                              </span>
-                              <div className="flex items-center gap-2">
-                                <span className="font-black text-[#800020]">
-                                  {r.amount} {ing?.unit}
+                      {!hasMultipleSizes ? (
+                        itemForm.recipe && itemForm.recipe.length > 0 ? (
+                          itemForm.recipe.map((r) => {
+                            const ing = ingredients.find((i) => i.id === r.ingId);
+                            return (
+                              <div
+                                key={r.ingId}
+                                className="flex justify-between items-center bg-white border border-[#E8DFE1] px-3 py-2 rounded-xl"
+                              >
+                                <span className="font-bold text-[#1F1716]">
+                                  {ing ? ing.name : r.ingId}
                                 </span>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleRemoveIngFromRecipe(r.ingId)
-                                  }
-                                  className="text-[#A8989B] hover:text-[#D32F2F]"
-                                >
-                                  <X size={14} />
-                                </button>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-[#800020]">
+                                    {r.amount} {ing?.unit}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveIngFromSingleRecipe(r.ingId)}
+                                    className="text-[#A8989B] hover:text-[#D32F2F]"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })
+                            );
+                          })
+                        ) : (
+                          <p className="text-[11px] text-[#A8989B] italic font-medium">
+                            ยังไม่ได้กำหนดวัตถุดิบในสูตร
+                          </p>
+                        )
                       ) : (
-                        <p className="text-[11px] text-[#A8989B] italic font-medium">
-                          ยังไม่ได้กำหนดวัตถุดิบในสูตร
-                        </p>
+                        itemForm.sizes?.[selectedSizeIdxForRecipe]?.recipe?.length > 0 ? (
+                          itemForm.sizes[selectedSizeIdxForRecipe].recipe.map((r) => {
+                            const ing = ingredients.find((i) => i.id === r.ingId);
+                            return (
+                              <div
+                                key={r.ingId}
+                                className="flex justify-between items-center bg-white border border-[#E8DFE1] px-3 py-2 rounded-xl"
+                              >
+                                <span className="font-bold text-[#1F1716]">
+                                  {ing ? ing.name : r.ingId}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-[#800020]">
+                                    {r.amount} {ing?.unit}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveIngFromSizeRecipe(selectedSizeIdxForRecipe, r.ingId)}
+                                    className="text-[#A8989B] hover:text-[#D32F2F]"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="text-[11px] text-[#A8989B] italic font-medium">
+                            ยังไม่ได้กำหนดวัตถุดิบในสูตรของขนาดนี้
+                          </p>
+                        )
                       )}
                     </div>
 
@@ -2354,7 +2579,7 @@ export default function App() {
 
                       <button
                         type="button"
-                        onClick={handleAddIngToRecipe}
+                        onClick={hasMultipleSizes ? handleAddIngToSizeRecipe : handleAddIngToSingleRecipe}
                         className="w-full bg-[#800020] text-white font-bold py-2.5 rounded-xl text-xs hover:bg-[#5B0015] transition cursor-pointer"
                       >
                         + เพิ่มวัตถุดิบในสูตร
@@ -2587,6 +2812,7 @@ export default function App() {
                         type="button"
                         onClick={() => {
                           setEditingItem(null);
+                          setHasMultipleSizes(false);
                           setItemForm({
                             name: "",
                             price: "",
@@ -2598,6 +2824,7 @@ export default function App() {
                             milkText: "นมสดธรรมดา (+0)",
                             addonsText: "เพิ่ม Shot กาแฟ (+25)",
                             recipe: [],
+                            sizes: [],
                           });
                         }}
                         className="px-4 border border-[#E8DFE1] rounded-2xl text-[#4D3F42] hover:bg-[#F7F2F3] font-bold text-xs transition cursor-pointer"
@@ -2619,6 +2846,7 @@ export default function App() {
                       <tr className="border-b border-[#F7F2F3] text-[#736366] font-bold uppercase">
                         <th className="pb-3">สินค้า</th>
                         <th className="pb-3">หมวดหมู่หลัก / ย่อย</th>
+                        <th className="pb-3">ขนาดที่มี</th>
                         <th className="pb-3">สถานะสต็อก</th>
                         <th className="pb-3">ราคา</th>
                         <th className="pb-3 text-right">จัดการ</th>
@@ -2628,6 +2856,8 @@ export default function App() {
                       {menuItems.map((item) => {
                         const inStock = isItemInStock(item);
                         const subCat = item.sub_category || item.subCategory;
+                        const hasSizes = item.sizes && item.sizes.length > 0;
+
                         return (
                           <tr
                             key={item.id}
@@ -2654,6 +2884,19 @@ export default function App() {
                               )}
                             </td>
                             <td className="py-3.5">
+                              {hasSizes ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {item.sizes.map((s, idx) => (
+                                    <span key={idx} className="text-[10px] bg-[#F7F2F3] border border-[#800020]/20 text-[#800020] font-black px-2 py-0.5 rounded-md">
+                                      {s.name} (฿{s.price})
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-[#A8989B] italic text-[11px]">ขนาดเดียว</span>
+                              )}
+                            </td>
+                            <td className="py-3.5">
                               {inStock ? (
                                 <span className="text-[11px] text-[#800020] bg-[#F7F2F3] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#800020]/20">
                                   <CheckCircle2 size={12} /> พร้อมขาย
@@ -2666,7 +2909,7 @@ export default function App() {
                               )}
                             </td>
                             <td className="py-3.5 font-black text-[#800020]">
-                              ฿{Number(item.price).toFixed(2)}
+                              {hasSizes ? `฿${item.sizes[0].price}+` : `฿${Number(item.price).toFixed(2)}`}
                             </td>
                             <td className="py-3.5 text-right space-x-2">
                               <button
@@ -3306,7 +3549,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Customization Modal */}
+      {/* Customization Modal (เลือกขนาดแก้ว & ออปชัน) */}
       {selectedItemForCustom && (
         <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-[#E8DFE1] animate-fadeIn">
@@ -3322,7 +3565,7 @@ export default function App() {
                     {selectedItemForCustom.name}
                   </h3>
                   <p className="text-xs font-bold text-[#E07A8B] mt-0.5">
-                    เริ่มต้น ฿{selectedItemForCustom.price}
+                    {selectedSize ? `ขนาด ${selectedSize.name} • ฿${selectedSize.price}` : `เริ่มต้น ฿${selectedItemForCustom.price}`}
                   </p>
                 </div>
               </div>
@@ -3335,6 +3578,42 @@ export default function App() {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6 text-xs custom-scrollbar">
+              {/* เลือกขนาดแก้ว (Size Selection) */}
+              {selectedItemForCustom.sizes && selectedItemForCustom.sizes.length > 0 && (
+                <div>
+                  <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
+                    ขนาดแก้ว (Size)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {selectedItemForCustom.sizes.map((sz) => {
+                      const sizeInStock = isSizeInStock(sz, selectedItemForCustom.recipe);
+                      const isSelected = selectedSize?.name === sz.name;
+
+                      return (
+                        <button
+                          key={sz.name}
+                          disabled={!sizeInStock}
+                          onClick={() => setSelectedSize(sz)}
+                          className={`p-3.5 rounded-2xl border flex justify-between items-center transition font-extrabold ${
+                            !sizeInStock
+                              ? "opacity-40 border-[#E8DFE1] bg-[#FCFAFA] cursor-not-allowed"
+                              : isSelected
+                              ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-xs cursor-pointer"
+                              : "border-[#E8DFE1] text-[#736366] hover:bg-[#FCFAFA] cursor-pointer"
+                          }`}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            {sz.name}
+                            {!sizeInStock && <span className="text-[9px] text-[#D32F2F] font-bold">(หมด)</span>}
+                          </span>
+                          <span className="text-[#800020] font-black">฿{sz.price}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {(selectedItemForCustom.sweetness_options || selectedItemForCustom.sweetnessOptions)?.length > 0 && (
                 <div>
                   <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
