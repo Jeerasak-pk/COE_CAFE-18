@@ -45,6 +45,7 @@ import {
   Cog,
   Cpu,
   Maximize2,
+  Wrench
 } from "lucide-react";
 
 const initialCategories = [
@@ -265,7 +266,6 @@ export default function App() {
   const isItemInStock = (item) => {
     if (!(item.in_stock ?? item.inStock ?? true)) return false;
 
-    // Check if item has sizes
     if (item.sizes && item.sizes.length > 0) {
       return item.sizes.some((sz) => checkRecipeStock(sz.recipe));
     }
@@ -630,7 +630,6 @@ export default function App() {
     }
   };
 
-  // Recipe Admin Handlers
   const handleAddIngToSingleRecipe = () => {
     if (!selectedIngForRecipe || !recipeIngAmount || Number(recipeIngAmount) <= 0) return;
 
@@ -656,7 +655,6 @@ export default function App() {
     }));
   };
 
-  // Multiple Sizes Admin Handlers
   const handleAddNewSize = () => {
     if (!newSizeName || !newSizePrice) return;
 
@@ -1110,15 +1108,15 @@ export default function App() {
   });
 
   return (
-    <div className="flex h-screen bg-[#FAF8F5] text-[#1F1716] font-sans antialiased overflow-hidden selection:bg-[#800020] selection:text-white">
-      {/* Sidebar Navigation */}
-      <aside className="w-22 bg-gradient-to-b from-[#3B000E] via-[#2A000A] to-[#170005] flex flex-col items-center py-7 justify-between text-[#F5E6E8] z-30 shrink-0 shadow-2xl border-r border-[#4A0817]">
+    <div className="flex h-screen bg-[#F8FAFC] text-[#0F172A] font-sans antialiased overflow-hidden selection:bg-[#E69A09] selection:text-white">
+      {/* Sidebar Navigation - Industrial Slate & Gold theme */}
+      <aside className="w-22 bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#090D16] flex flex-col items-center py-7 justify-between text-[#E2E8F0] z-30 shrink-0 shadow-2xl border-r border-[#334155]">
         <div className="flex flex-col items-center gap-9 w-full px-3">
           <div className="relative group cursor-pointer">
-            <div className="absolute -inset-1.5 bg-gradient-to-r from-[#A31B38] via-[#800020] to-[#5B0015] rounded-2xl blur-md opacity-60 group-hover:opacity-100 transition duration-500"></div>
-            <div className="relative p-3 bg-[#420512] text-[#F3C6CE] rounded-2xl flex items-center justify-center shadow-2xl border border-[#6B1124]">
-              <Cpu size={22} className="text-[#E07A8B] transform group-hover:rotate-45 transition duration-500 absolute -top-1 -right-1 opacity-80" />
-              <Coffee size={24} className="text-[#F3C6CE] transform group-hover:scale-110 transition duration-300 relative z-10" />
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-[#F59E0B] via-[#E69A09] to-[#B45309] rounded-2xl blur-md opacity-60 group-hover:opacity-100 transition duration-500"></div>
+            <div className="relative p-3 bg-[#1E293B] text-[#FBBF24] rounded-2xl flex items-center justify-center shadow-2xl border border-[#475569]">
+              <Cog size={22} className="text-[#F59E0B] animate-spin-slow absolute -top-1 -right-1 opacity-80" />
+              <Coffee size={24} className="text-[#FBBF24] transform group-hover:scale-110 transition duration-300 relative z-10" />
             </div>
           </div>
 
@@ -1128,13 +1126,13 @@ export default function App() {
               title="หน้าขาย (POS)"
               className={`p-3.5 rounded-2xl transition duration-300 cursor-pointer relative group ${
                 activeTab === "pos"
-                  ? "bg-gradient-to-br from-[#800020] to-[#5B0015] text-white shadow-lg shadow-[#800020]/40 -translate-y-0.5 border border-[#A31B38]/50"
-                  : "text-[#D1A3AC] hover:bg-[#4A0A18] hover:text-[#F3C6CE]"
+                  ? "bg-gradient-to-br from-[#E69A09] to-[#B45309] text-white shadow-lg shadow-[#E69A09]/40 -translate-y-0.5 border border-[#F59E0B]/50"
+                  : "text-[#94A3B8] hover:bg-[#334155] hover:text-[#F8FAFC]"
               }`}
             >
               <ShoppingBag size={21} />
               {activeTab === "pos" && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#E07A8B] rounded-l-full shadow-glow"></span>
+                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#FBBF24] rounded-l-full shadow-glow"></span>
               )}
             </button>
 
@@ -1143,18 +1141,18 @@ export default function App() {
               title="จอแสดงผลในครัว (Kitchen Display)"
               className={`p-3.5 rounded-2xl transition duration-300 cursor-pointer relative group ${
                 activeTab === "kitchen"
-                  ? "bg-gradient-to-br from-[#800020] to-[#5B0015] text-white shadow-lg shadow-[#800020]/40 -translate-y-0.5 border border-[#A31B38]/50"
-                  : "text-[#D1A3AC] hover:bg-[#4A0A18] hover:text-[#F3C6CE]"
+                  ? "bg-gradient-to-br from-[#E69A09] to-[#B45309] text-white shadow-lg shadow-[#E69A09]/40 -translate-y-0.5 border border-[#F59E0B]/50"
+                  : "text-[#94A3B8] hover:bg-[#334155] hover:text-[#F8FAFC]"
               }`}
             >
               <UtensilsCrossed size={21} />
               {kitchenOrders.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#E03A3A] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center animate-bounce shadow-md border-2 border-[#3B000E]">
+                <span className="absolute -top-1 -right-1 bg-[#EF4444] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center animate-bounce shadow-md border-2 border-[#0F172A]">
                   {kitchenOrders.length}
                 </span>
               )}
               {activeTab === "kitchen" && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#E07A8B] rounded-l-full shadow-glow"></span>
+                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#FBBF24] rounded-l-full shadow-glow"></span>
               )}
             </button>
 
@@ -1163,19 +1161,19 @@ export default function App() {
               title="แดชบอร์ด & ประวัติคำสั่งซื้อ"
               className={`p-3.5 rounded-2xl transition duration-300 cursor-pointer relative group ${
                 activeTab === "dashboard"
-                  ? "bg-gradient-to-br from-[#800020] to-[#5B0015] text-white shadow-lg shadow-[#800020]/40 -translate-y-0.5 border border-[#A31B38]/50"
-                  : "text-[#D1A3AC] hover:bg-[#4A0A18] hover:text-[#F3C6CE]"
+                  ? "bg-gradient-to-br from-[#E69A09] to-[#B45309] text-white shadow-lg shadow-[#E69A09]/40 -translate-y-0.5 border border-[#F59E0B]/50"
+                  : "text-[#94A3B8] hover:bg-[#334155] hover:text-[#F8FAFC]"
               }`}
             >
               <LayoutDashboard size={21} />
               {!isManagementAuthenticated && (
                 <Lock
                   size={11}
-                  className="absolute top-2 right-2 text-[#E07A8B]"
+                  className="absolute top-2 right-2 text-[#FBBF24]"
                 />
               )}
               {activeTab === "dashboard" && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#E07A8B] rounded-l-full shadow-glow"></span>
+                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#FBBF24] rounded-l-full shadow-glow"></span>
               )}
             </button>
 
@@ -1184,19 +1182,19 @@ export default function App() {
               title="จัดการระบบ Admin Panel"
               className={`p-3.5 rounded-2xl transition duration-300 cursor-pointer relative group ${
                 activeTab === "admin"
-                  ? "bg-gradient-to-br from-[#800020] to-[#5B0015] text-white shadow-lg shadow-[#800020]/40 -translate-y-0.5 border border-[#A31B38]/50"
-                  : "text-[#D1A3AC] hover:bg-[#4A0A18] hover:text-[#F3C6CE]"
+                  ? "bg-gradient-to-br from-[#E69A09] to-[#B45309] text-white shadow-lg shadow-[#E69A09]/40 -translate-y-0.5 border border-[#F59E0B]/50"
+                  : "text-[#94A3B8] hover:bg-[#334155] hover:text-[#F8FAFC]"
               }`}
             >
               <Settings size={21} />
               {!isManagementAuthenticated && (
                 <Lock
                   size={11}
-                  className="absolute top-2 right-2 text-[#E07A8B]"
+                  className="absolute top-2 right-2 text-[#FBBF24]"
                 />
               )}
               {activeTab === "admin" && (
-                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#E07A8B] rounded-l-full shadow-glow"></span>
+                <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#FBBF24] rounded-l-full shadow-glow"></span>
               )}
             </button>
           </nav>
@@ -1205,7 +1203,7 @@ export default function App() {
         <button
           onClick={() => setIsLogoutModalOpen(true)}
           title="ออกจากระบบ"
-          className="p-3.5 text-[#D1A3AC] hover:text-[#FF6B6B] rounded-2xl cursor-pointer transition duration-300 hover:bg-[#4A0A18]"
+          className="p-3.5 text-[#94A3B8] hover:text-[#EF4444] rounded-2xl cursor-pointer transition duration-300 hover:bg-[#334155]"
         >
           <LogOut size={20} />
         </button>
@@ -1214,30 +1212,30 @@ export default function App() {
       {/* POS Screen */}
       {activeTab === "pos" && (
         <>
-          <main className="flex-1 flex flex-col p-8 overflow-hidden bg-[#FAF8F5]">
+          <main className="flex-1 flex flex-col p-8 overflow-hidden bg-[#F8FAFC]">
             <header className="flex justify-between items-center mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-black text-[#1F1716] tracking-tight flex items-center gap-2">
-                    COE_CAFE#18 <Cog size={20} className="text-[#800020] animate-spin-slow" />
+                  <h1 className="text-2xl font-black text-[#0F172A] tracking-tight flex items-center gap-2">
+                    SWEET GEAR CAFE <Cog size={22} className="text-[#E69A09] animate-spin-slow" />
                   </h1>
-                  <span className="bg-gradient-to-r from-[#800020] to-[#5B0015] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider border border-[#800020]/30 shadow-xs">
-                    Engineering Edition
+                  <span className="bg-gradient-to-r from-[#E69A09] to-[#B45309] text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider border border-[#E69A09]/30 shadow-xs flex items-center gap-1">
+                    <Wrench size={10} /> วิศวะสายหวาน
                   </span>
                 </div>
-                <p className="text-xs font-semibold text-[#736366] mt-1 flex items-center gap-2">
-                  <span className="inline-block w-2 h-2 rounded-full bg-[#2E6F40] animate-pulse"></span>
+                <p className="text-xs font-semibold text-[#64748B] mt-1 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
                   คิวถัดไป:{" "}
-                  <span className="font-extrabold text-[#800020]">
+                  <span className="font-extrabold text-[#E69A09]">
                     #{String(orderQueueCount).padStart(2, "0")}
                   </span>{" "}
-                  <span className="text-[#C2B4B7]">|</span> บาริสต้า: COE Barista #01
+                  <span className="text-[#CBD5E1]">|</span> บาริสต้า: COE Engineer #01
                 </p>
               </div>
 
               <div className="relative w-84">
                 <Search
-                  className="absolute left-4 top-3.5 text-[#A8989B]"
+                  className="absolute left-4 top-3.5 text-[#94A3B8]"
                   size={17}
                 />
                 <input
@@ -1245,7 +1243,7 @@ export default function App() {
                   placeholder="ค้นหาเมนูเครื่องดื่ม หรือ เบเกอรี..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-white/90 backdrop-blur-md rounded-2xl border border-[#E3D8DA] focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent shadow-xs text-xs font-semibold transition placeholder:text-[#A8989B]"
+                  className="w-full pl-11 pr-4 py-3 bg-white/90 backdrop-blur-md rounded-2xl border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#E69A09] focus:border-transparent shadow-xs text-xs font-semibold transition placeholder:text-[#94A3B8]"
                 />
               </div>
             </header>
@@ -1260,8 +1258,8 @@ export default function App() {
                   }}
                   className={`px-6 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
                     selectedCategory === cat.id
-                      ? "bg-[#800020] text-white shadow-lg shadow-[#800020]/25 border border-[#800020] -translate-y-0.5"
-                      : "bg-white text-[#4D3F42] hover:bg-[#F3E9EB] border border-[#E3D8DA] shadow-xs"
+                      ? "bg-[#E69A09] text-white shadow-lg shadow-[#E69A09]/25 border border-[#E69A09] -translate-y-0.5"
+                      : "bg-white text-[#334155] hover:bg-[#FEF3C7] border border-[#E2E8F0] shadow-xs"
                   }`}
                 >
                   {cat.name}
@@ -1277,8 +1275,8 @@ export default function App() {
                     onClick={() => setSelectedSubCategory(sub.id)}
                     className={`px-4 py-1.5 rounded-xl text-[11px] font-bold transition duration-200 cursor-pointer ${
                       selectedSubCategory === sub.id
-                        ? "bg-[#5B0015] text-white shadow-xs"
-                        : "bg-[#F3E9EB]/60 text-[#800020] hover:bg-[#F3E9EB] border border-[#800020]/15"
+                        ? "bg-[#B45309] text-white shadow-xs"
+                        : "bg-[#FEF3C7]/60 text-[#B45309] hover:bg-[#FEF3C7] border border-[#E69A09]/20"
                     }`}
                   >
                     {sub.name}
@@ -1300,19 +1298,19 @@ export default function App() {
                     <div
                       key={item.id}
                       onClick={() => handleItemClick(item)}
-                      className={`bg-white rounded-3xl p-4 border border-[#E8DFE1] hover:border-[#800020] transition-all duration-300 flex flex-col justify-between group h-68 relative overflow-hidden shadow-xs hover:shadow-xl ${
+                      className={`bg-white rounded-3xl p-4 border border-[#E2E8F0] hover:border-[#E69A09] transition-all duration-300 flex flex-col justify-between group h-68 relative overflow-hidden shadow-xs hover:shadow-xl ${
                         inStock
                           ? "cursor-pointer hover:-translate-y-1.5"
                           : "opacity-60 cursor-not-allowed"
                       }`}
                     >
                       {!inStock && (
-                        <span className="absolute top-3 right-3 bg-[#D32F2F] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full z-10 shadow-md uppercase tracking-wider">
+                        <span className="absolute top-3 right-3 bg-[#EF4444] text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full z-10 shadow-md uppercase tracking-wider">
                           {!(item.in_stock ?? item.inStock) ? "สินค้าหมด" : "วัตถุดิบหมด"}
                         </span>
                       )}
 
-                      <div className="w-full h-38 rounded-2xl overflow-hidden mb-3 bg-[#F7F2F3] shrink-0 relative">
+                      <div className="w-full h-38 rounded-2xl overflow-hidden mb-3 bg-[#F1F5F9] shrink-0 relative">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -1327,14 +1325,14 @@ export default function App() {
                       </div>
 
                       <div className="flex flex-col justify-between flex-1">
-                        <h3 className="font-extrabold text-[#1F1716] text-xs line-clamp-1 group-hover:text-[#800020] transition duration-200">
+                        <h3 className="font-extrabold text-[#0F172A] text-xs line-clamp-1 group-hover:text-[#E69A09] transition duration-200">
                           {item.name}
                         </h3>
                         <div className="flex justify-between items-center mt-2.5">
-                          <p className="text-[#800020] font-black text-base">
+                          <p className="text-[#E69A09] font-black text-base">
                             {displayPrice}
                           </p>
-                          <span className="w-7 h-7 bg-[#F7F2F3] text-[#800020] group-hover:bg-[#800020] group-hover:text-white rounded-xl flex items-center justify-center transition duration-300 shadow-xs">
+                          <span className="w-7 h-7 bg-[#F1F5F9] text-[#E69A09] group-hover:bg-[#E69A09] group-hover:text-white rounded-xl flex items-center justify-center transition duration-300 shadow-xs">
                             <Plus size={14} />
                           </span>
                         </div>
@@ -1347,29 +1345,29 @@ export default function App() {
           </main>
 
           {/* Cart Panel */}
-          <aside className="w-100 bg-white border-l border-[#E8DFE1] p-7 flex flex-col justify-between shadow-2xl shrink-0 z-10">
+          <aside className="w-100 bg-white border-l border-[#E2E8F0] p-7 flex flex-col justify-between shadow-2xl shrink-0 z-10">
             <div>
-              <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#F7F2F3]">
-                <h2 className="text-lg font-black text-[#1F1716] flex items-center gap-2">
-                  <ShoppingBag size={20} className="text-[#800020]" />{" "}
+              <div className="flex justify-between items-center mb-6 pb-4 border-b border-[#F1F5F9]">
+                <h2 className="text-lg font-black text-[#0F172A] flex items-center gap-2">
+                  <ShoppingBag size={20} className="text-[#E69A09]" />{" "}
                   ตะกร้าสินค้า
                 </h2>
-                <span className="text-xs font-black text-[#800020] bg-[#F7F2F3] px-3 py-1 rounded-full border border-[#800020]/20">
+                <span className="text-xs font-black text-[#E69A09] bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#E69A09]/30">
                   {cart.reduce((a, i) => a + i.qty, 0)} รายการ
                 </span>
               </div>
 
               <div className="flex-1 overflow-y-auto max-h-[42vh] space-y-3 pr-1 custom-scrollbar">
                 {cart.length === 0 ? (
-                  <div className="text-center py-20 text-[#A8989B]">
+                  <div className="text-center py-20 text-[#94A3B8]">
                     <Sparkle
                       size={36}
-                      className="mx-auto mb-3 text-[#800020]/30 animate-pulse"
+                      className="mx-auto mb-3 text-[#E69A09]/40 animate-pulse"
                     />
-                    <p className="text-xs font-bold text-[#736366]">
+                    <p className="text-xs font-bold text-[#64748B]">
                       ยังไม่มีรายการในตะกร้า
                     </p>
-                    <p className="text-[11px] text-[#A8989B] mt-1">
+                    <p className="text-[11px] text-[#94A3B8] mt-1">
                       เลือกเมนูกาแฟหรือเบเกอรีด้านซ้ายมือ
                     </p>
                   </div>
@@ -1377,39 +1375,39 @@ export default function App() {
                   cart.map((item) => (
                     <div
                       key={item.cartId}
-                      className="flex justify-between items-center bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] hover:border-[#800020] transition duration-200 shadow-xs"
+                      className="flex justify-between items-center bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] hover:border-[#E69A09] transition duration-200 shadow-xs"
                     >
                       <div className="max-w-[190px]">
-                        <p className="font-extrabold text-[#1F1716] text-xs">
+                        <p className="font-extrabold text-[#0F172A] text-xs">
                           {item.name}
                         </p>
-                        <p className="text-[10px] font-semibold text-[#736366] truncate mt-0.5">
+                        <p className="text-[10px] font-semibold text-[#64748B] truncate mt-0.5">
                           {item.optionsText}
                         </p>
 
                         {item.noteText && (
-                          <p className="text-[10px] font-bold text-[#800020] bg-[#F7F2F3] px-2 py-0.5 rounded-md mt-1 italic w-fit flex items-center gap-1">
+                          <p className="text-[10px] font-bold text-[#B45309] bg-[#FEF3C7] px-2 py-0.5 rounded-md mt-1 italic w-fit flex items-center gap-1">
                             <FileText size={10} /> {item.noteText}
                           </p>
                         )}
 
-                        <p className="text-xs text-[#800020] font-black mt-1.5">
+                        <p className="text-xs text-[#E69A09] font-black mt-1.5">
                           ฿{item.unitPrice}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-xl border border-[#E8DFE1] shadow-xs">
+                      <div className="flex items-center gap-2 bg-white px-2.5 py-1.5 rounded-xl border border-[#E2E8F0] shadow-xs">
                         <button
                           onClick={() => updateQty(item.cartId, -1)}
-                          className="text-[#A8989B] hover:text-[#D32F2F] cursor-pointer transition"
+                          className="text-[#94A3B8] hover:text-[#EF4444] cursor-pointer transition"
                         >
                           <Trash2 size={13} />
                         </button>
-                        <span className="text-xs font-black w-5 text-center text-[#1F1716]">
+                        <span className="text-xs font-black w-5 text-center text-[#0F172A]">
                           {item.qty}
                         </span>
                         <button
                           onClick={() => updateQty(item.cartId, 1)}
-                          className="text-[#A8989B] hover:text-[#800020] cursor-pointer transition"
+                          className="text-[#94A3B8] hover:text-[#E69A09] cursor-pointer transition"
                         >
                           <Plus size={13} />
                         </button>
@@ -1420,9 +1418,9 @@ export default function App() {
               </div>
 
               {cart.length > 0 && (
-                <div className="mt-5 pt-4 border-t border-[#F7F2F3]">
-                  <label className="text-[11px] font-extrabold text-[#736366] mb-2 flex items-center gap-1.5">
-                    <Tag size={13} className="text-[#800020]" /> เลือกโปรโมชั่น
+                <div className="mt-5 pt-4 border-t border-[#F1F5F9]">
+                  <label className="text-[11px] font-extrabold text-[#64748B] mb-2 flex items-center gap-1.5">
+                    <Tag size={13} className="text-[#E69A09]" /> เลือกโปรโมชั่น
                   </label>
                   <select
                     value={selectedPromo ? selectedPromo.id : ""}
@@ -1432,7 +1430,7 @@ export default function App() {
                       );
                       setSelectedPromo(promo || null);
                     }}
-                    className="w-full p-2.5 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl text-xs font-bold text-[#1F1716] outline-none shadow-xs focus:ring-2 focus:ring-[#800020]"
+                    className="w-full p-2.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#0F172A] outline-none shadow-xs focus:ring-2 focus:ring-[#E69A09]"
                   >
                     <option value="">-- ไม่ใช้โปรโมชั่น --</option>
                     {promotions
@@ -1459,22 +1457,22 @@ export default function App() {
               )}
             </div>
 
-            <div className="border-t border-[#F7F2F3] pt-4 space-y-2">
-              <div className="flex justify-between text-xs font-semibold text-[#736366]">
+            <div className="border-t border-[#F1F5F9] pt-4 space-y-2">
+              <div className="flex justify-between text-xs font-semibold text-[#64748B]">
                 <span>ยอดรวม (Subtotal)</span>
                 <span>฿{subtotal.toFixed(2)}</span>
               </div>
               {effectiveDiscount > 0 && (
-                <div className="flex justify-between text-xs font-extrabold text-[#D32F2F]">
+                <div className="flex justify-between text-xs font-extrabold text-[#EF4444]">
                   <span>ส่วนลดโปรโมชั่น/พิเศษ</span>
                   <span>-฿{effectiveDiscount.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-base font-black text-[#1F1716] pt-2.5 border-t border-[#E8DFE1]">
+              <div className="flex justify-between text-base font-black text-[#0F172A] pt-2.5 border-t border-[#E2E8F0]">
                 <span>ยอดรวมสุทธิ (รวม VAT)</span>
-                <span className="text-[#800020] text-lg">฿{total.toFixed(2)}</span>
+                <span className="text-[#E69A09] text-lg">฿{total.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-[11px] font-semibold text-[#A8989B]">
+              <div className="flex justify-between text-[11px] font-semibold text-[#94A3B8]">
                 <span>(รวมภาษีมูลค่าเพิ่ม 7%)</span>
                 <span>฿{vat.toFixed(2)}</span>
               </div>
@@ -1482,7 +1480,7 @@ export default function App() {
               <button
                 disabled={cart.length === 0}
                 onClick={() => setIsCheckoutOpen(true)}
-                className="w-full mt-4 bg-gradient-to-r from-[#800020] to-[#5B0015] hover:from-[#6B001B] hover:to-[#40000E] disabled:bg-[#E8DFE1] disabled:text-[#A8989B] text-white font-black py-4 rounded-2xl shadow-lg shadow-[#800020]/20 flex justify-center items-center gap-2 transition duration-300 cursor-pointer text-xs uppercase tracking-wider"
+                className="w-full mt-4 bg-gradient-to-r from-[#E69A09] to-[#B45309] hover:from-[#D97706] hover:to-[#92400E] disabled:bg-[#E2E8F0] disabled:text-[#94A3B8] text-white font-black py-4 rounded-2xl shadow-lg shadow-[#E69A09]/20 flex justify-center items-center gap-2 transition duration-300 cursor-pointer text-xs uppercase tracking-wider"
               >
                 <CreditCard size={17} /> ชำระเงิน (฿{total.toFixed(2)})
               </button>
@@ -1491,31 +1489,31 @@ export default function App() {
         </>
       )}
 
-      {/* Kitchen Display Screen */}
+      {/* Kitchen Display Screen - Dark Industrial Metallic Theme */}
       {activeTab === "kitchen" && (
-        <main className="flex-1 p-8 bg-[#1A0006] text-white overflow-y-auto custom-scrollbar">
-          <div className="flex justify-between items-center mb-8 border-b border-[#3B0A16] pb-5">
+        <main className="flex-1 p-8 bg-[#0B0F17] text-white overflow-y-auto custom-scrollbar">
+          <div className="flex justify-between items-center mb-8 border-b border-[#1E293B] pb-5">
             <div>
               <div className="flex items-center gap-3">
-                <UtensilsCrossed size={32} className="text-[#E07A8B]" />
-                <h1 className="text-2xl font-black text-[#F3C6CE] tracking-tight">
-                  COE Kitchen & Barista Monitor
+                <UtensilsCrossed size={32} className="text-[#FBBF24]" />
+                <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">
+                  SWEET GEAR Kitchen & Barista Monitor
                 </h1>
               </div>
-              <p className="text-xs text-[#C2A3A9] mt-1 font-medium">
+              <p className="text-xs text-[#94A3B8] mt-1 font-medium">
                 วัตถุดิบจะถูกตัดสต็อกจริงตามสูตรขนาดแก้วเมื่อกด "ทำเสร็จสิ้น" เท่านั้น
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <span className="bg-[#2B050E] border border-[#4D0D1D] px-5 py-2.5 rounded-2xl text-xs font-bold text-[#E07A8B] flex items-center gap-2 shadow-inner">
+              <span className="bg-[#1E293B] border border-[#334155] px-5 py-2.5 rounded-2xl text-xs font-bold text-[#FBBF24] flex items-center gap-2 shadow-inner">
                 <Clock size={18} /> กำลังรอทำ: {kitchenOrders.length} ออเดอร์
               </span>
             </div>
           </div>
 
           {kitchenOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-40 text-[#A8858C]">
-              <CheckCircle2 size={64} className="mb-3 text-[#E07A8B]/20" />
+            <div className="flex flex-col items-center justify-center py-40 text-[#64748B]">
+              <CheckCircle2 size={64} className="mb-3 text-[#FBBF24]/30" />
               <p className="text-lg font-extrabold text-white">
                 ไม่มีรายการค้างในครัว
               </p>
@@ -1537,14 +1535,14 @@ export default function App() {
                 return (
                   <div
                     key={order.id}
-                    className={`bg-[#2B050E] rounded-3xl border flex flex-col justify-between overflow-hidden shadow-2xl h-[550px] transition-all duration-300 ${
+                    className={`bg-[#1E293B] rounded-3xl border flex flex-col justify-between overflow-hidden shadow-2xl h-[550px] transition-all duration-300 ${
                       isPreparing
-                        ? "border-[#E07A8B] ring-2 ring-[#E07A8B]/30"
-                        : "border-[#4D0D1D]"
+                        ? "border-[#F59E0B] ring-2 ring-[#F59E0B]/30"
+                        : "border-[#334155]"
                     }`}
                   >
                     <div
-                      className={`p-4.5 flex justify-between items-center shrink-0 ${isPreparing ? "bg-gradient-to-r from-[#800020] to-[#5B0015] text-white" : "bg-[#3B0815] text-[#F3C6CE]"}`}
+                      className={`p-4.5 flex justify-between items-center shrink-0 ${isPreparing ? "bg-gradient-to-r from-[#E69A09] to-[#B45309] text-white" : "bg-[#0F172A] text-[#F8FAFC]"}`}
                     >
                       <div>
                         <div className="flex items-center gap-2">
@@ -1566,18 +1564,18 @@ export default function App() {
                       <span
                         className={`text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
                           isPreparing
-                            ? "bg-white text-[#800020] shadow-xs"
-                            : "bg-[#1A0006] text-[#E07A8B]"
+                            ? "bg-white text-[#B45309] shadow-xs"
+                            : "bg-[#0F172A] text-[#FBBF24]"
                         }`}
                       >
                         {isPreparing ? "กำลังทำ" : "รอดำเนินการ"}
                       </span>
                     </div>
 
-                    <div className="p-4.5 space-y-4 flex-1 overflow-y-auto bg-[#22020A] custom-scrollbar">
+                    <div className="p-4.5 space-y-4 flex-1 overflow-y-auto bg-[#0F172A] custom-scrollbar">
                       {coffeeItems.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-black text-[#E07A8B] uppercase tracking-wider mb-2 border-b border-[#4D0D1D] pb-1 flex justify-between">
+                          <p className="text-[10px] font-black text-[#FBBF24] uppercase tracking-wider mb-2 border-b border-[#334155] pb-1 flex justify-between">
                             <span>☕ COFFEE</span>
                             <span>{coffeeItems.length} รายการ</span>
                           </p>
@@ -1585,21 +1583,21 @@ export default function App() {
                             {coffeeItems.map((item, idx) => (
                               <div
                                 key={idx}
-                                className="bg-[#FAF8F5] text-[#1F1716] p-3 rounded-2xl border border-[#E8DFE1] shadow-xs"
+                                className="bg-[#F8FAFC] text-[#0F172A] p-3 rounded-2xl border border-[#E2E8F0] shadow-xs"
                               >
                                 <div className="flex justify-between items-start gap-2">
                                   <span className="font-extrabold text-xs leading-snug">
                                     {item.name}
                                   </span>
-                                  <span className="bg-[#800020] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
+                                  <span className="bg-[#E69A09] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
                                     x{item.qty}
                                   </span>
                                 </div>
-                                <p className="text-[11px] font-bold text-[#736366] mt-1">
+                                <p className="text-[11px] font-bold text-[#64748B] mt-1">
                                   {item.optionsText}
                                 </p>
                                 {item.noteText && (
-                                  <p className="text-[11px] font-bold text-[#D32F2F] bg-[#FDF2F2] p-1.5 rounded-lg mt-1.5 border border-[#F8D7D7] flex items-center gap-1">
+                                  <p className="text-[11px] font-bold text-[#EF4444] bg-[#FEF2F2] p-1.5 rounded-lg mt-1.5 border border-[#FCA5A5] flex items-center gap-1">
                                     <FileText size={12} className="shrink-0" />{" "}
                                     * {item.noteText}
                                   </p>
@@ -1612,7 +1610,7 @@ export default function App() {
 
                       {nonCoffeeItems.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-black text-[#E07A8B] uppercase tracking-wider mb-2 border-b border-[#4D0D1D] pb-1 flex justify-between">
+                          <p className="text-[10px] font-black text-[#FBBF24] uppercase tracking-wider mb-2 border-b border-[#334155] pb-1 flex justify-between">
                             <span>🍵 NON-COFFEE</span>
                             <span>{nonCoffeeItems.length} รายการ</span>
                           </p>
@@ -1620,21 +1618,21 @@ export default function App() {
                             {nonCoffeeItems.map((item, idx) => (
                               <div
                                 key={idx}
-                                className="bg-[#FAF8F5] text-[#1F1716] p-3 rounded-2xl border border-[#E8DFE1] shadow-xs"
+                                className="bg-[#F8FAFC] text-[#0F172A] p-3 rounded-2xl border border-[#E2E8F0] shadow-xs"
                               >
                                 <div className="flex justify-between items-start gap-2">
                                   <span className="font-extrabold text-xs leading-snug">
                                     {item.name}
                                   </span>
-                                  <span className="bg-[#800020] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
+                                  <span className="bg-[#E69A09] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
                                     x{item.qty}
                                   </span>
                                 </div>
-                                <p className="text-[11px] font-bold text-[#736366] mt-1">
+                                <p className="text-[11px] font-bold text-[#64748B] mt-1">
                                   {item.optionsText}
                                 </p>
                                 {item.noteText && (
-                                  <p className="text-[11px] font-bold text-[#D32F2F] bg-[#FDF2F2] p-1.5 rounded-lg mt-1.5 border border-[#F8D7D7] flex items-center gap-1">
+                                  <p className="text-[11px] font-bold text-[#EF4444] bg-[#FEF2F2] p-1.5 rounded-lg mt-1.5 border border-[#FCA5A5] flex items-center gap-1">
                                     <FileText size={12} className="shrink-0" />{" "}
                                     * {item.noteText}
                                   </p>
@@ -1647,7 +1645,7 @@ export default function App() {
 
                       {bakeryItems.length > 0 && (
                         <div>
-                          <p className="text-[10px] font-black text-[#E07A8B] uppercase tracking-wider mb-2 border-b border-[#4D0D1D] pb-1 flex justify-between">
+                          <p className="text-[10px] font-black text-[#FBBF24] uppercase tracking-wider mb-2 border-b border-[#334155] pb-1 flex justify-between">
                             <span>🥐 BAKERY</span>
                             <span>{bakeryItems.length} รายการ</span>
                           </p>
@@ -1655,23 +1653,23 @@ export default function App() {
                             {bakeryItems.map((item, idx) => (
                               <div
                                 key={idx}
-                                className="bg-[#FAF8F5] text-[#1F1716] p-3 rounded-2xl border border-[#E8DFE1] shadow-xs"
+                                className="bg-[#F8FAFC] text-[#0F172A] p-3 rounded-2xl border border-[#E2E8F0] shadow-xs"
                               >
                                 <div className="flex justify-between items-start gap-2">
                                   <span className="font-extrabold text-xs leading-snug">
                                     {item.name}
                                   </span>
-                                  <span className="bg-[#800020] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
+                                  <span className="bg-[#E69A09] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">
                                     x{item.qty}
                                   </span>
                                 </div>
                                 {item.optionsText !== "ปกติ" && (
-                                  <p className="text-[11px] font-bold text-[#736366] mt-1">
+                                  <p className="text-[11px] font-bold text-[#64748B] mt-1">
                                     {item.optionsText}
                                   </p>
                                 )}
                                 {item.noteText && (
-                                  <p className="text-[11px] font-bold text-[#D32F2F] bg-[#FDF2F2] p-1.5 rounded-lg mt-1.5 border border-[#F8D7D7] flex items-center gap-1">
+                                  <p className="text-[11px] font-bold text-[#EF4444] bg-[#FEF2F2] p-1.5 rounded-lg mt-1.5 border border-[#FCA5A5] flex items-center gap-1">
                                     <FileText size={12} className="shrink-0" />{" "}
                                     * {item.noteText}
                                   </p>
@@ -1683,13 +1681,13 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="p-3.5 bg-[#2B050E] border-t border-[#4D0D1D] shrink-0 space-y-2">
+                    <div className="p-3.5 bg-[#1E293B] border-t border-[#334155] shrink-0 space-y-2">
                       {order.status === "pending" ? (
                         <button
                           onClick={() =>
                             handleUpdateOrderStatus(order.id, "preparing")
                           }
-                          className="w-full bg-[#800020] hover:bg-[#5B0015] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
+                          className="w-full bg-[#E69A09] hover:bg-[#D97706] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
                         >
                           ▶ เริ่มทำออเดอร์
                         </button>
@@ -1698,7 +1696,7 @@ export default function App() {
                           onClick={() =>
                             handleUpdateOrderStatus(order.id, "completed")
                           }
-                          className="w-full bg-[#2E6F40] hover:bg-[#235631] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
+                          className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
                         >
                           <Check size={16} /> ทำเสร็จสิ้น (ตัดสต็อกวัตถุดิบ)
                         </button>
@@ -1708,7 +1706,7 @@ export default function App() {
                         onClick={() =>
                           handleUpdateOrderStatus(order.id, "cancelled")
                         }
-                        className="w-full bg-[#4A0A18] hover:bg-[#D32F2F] text-[#FF9E9E] hover:text-white border border-[#D32F2F]/30 font-bold py-2 rounded-xl text-[11px] transition cursor-pointer flex justify-center items-center gap-1.5"
+                        className="w-full bg-[#334155] hover:bg-[#EF4444] text-[#FCA5A5] hover:text-white border border-[#EF4444]/30 font-bold py-2 rounded-xl text-[11px] transition cursor-pointer flex justify-center items-center gap-1.5"
                       >
                         <Ban size={13} /> ยกเลิกออเดอร์นี้ (ไม่คิดเงิน/ไม่ตัดสต็อก)
                       </button>
@@ -1723,19 +1721,19 @@ export default function App() {
 
       {/* Dashboard Screen */}
       {activeTab === "dashboard" && (
-        <main className="flex-1 p-8 bg-[#FAF8F5] overflow-y-auto custom-scrollbar">
+        <main className="flex-1 p-8 bg-[#F8FAFC] overflow-y-auto custom-scrollbar">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-black text-[#1F1716] flex items-center gap-2 tracking-tight">
-                  <LayoutDashboard size={24} className="text-[#800020]" />{" "}
-                  แดชบอร์ด & รายงานยอดขาย COE_CAFE
+                <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-2 tracking-tight">
+                  <LayoutDashboard size={24} className="text-[#E69A09]" />{" "}
+                  แดชบอร์ด & รายงานยอดขาย SWEET GEAR CAFE
                 </h1>
-                <span className="bg-[#EAF4ED] text-[#2E6F40] text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 border border-[#2E6F40]/20 shadow-xs">
+                <span className="bg-[#D1FAE5] text-[#059669] text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 border border-[#10B981]/20 shadow-xs">
                   <CheckCircle2 size={12} /> ปลดล็อกรหัสแล้ว
                 </span>
               </div>
-              <p className="text-xs font-semibold text-[#736366] mt-1">
+              <p className="text-xs font-semibold text-[#64748B] mt-1">
                 เลือกดูรายละเอียด ยอดขาย รายรับ-รายจ่าย ประจำวันและประจำเดือน
               </p>
             </div>
@@ -1743,7 +1741,7 @@ export default function App() {
             <div className="flex items-center gap-2.5 flex-wrap">
               <button
                 onClick={handleResetToToday}
-                className="bg-[#F3E9EB] hover:bg-[#E8D4D8] text-[#800020] font-black px-3.5 py-2.5 rounded-2xl text-xs transition border border-[#800020]/20 flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#B45309] font-black px-3.5 py-2.5 rounded-2xl text-xs transition border border-[#E69A09]/20 flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Calendar size={15} /> วันนี้ (ปัจจุบัน)
               </button>
@@ -1751,7 +1749,7 @@ export default function App() {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="bg-white border border-[#E8DFE1] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#1F1716] outline-none shadow-xs focus:ring-2 focus:ring-[#800020]"
+                className="bg-white border border-[#E2E8F0] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#0F172A] outline-none shadow-xs focus:ring-2 focus:ring-[#E69A09]"
               >
                 {[2024, 2025, 2026, 2027].map((y) => (
                   <option key={y} value={y}>พ.ศ. {y + 543}</option>
@@ -1761,7 +1759,7 @@ export default function App() {
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="bg-white border border-[#E8DFE1] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#1F1716] outline-none shadow-xs focus:ring-2 focus:ring-[#800020]"
+                className="bg-white border border-[#E2E8F0] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#0F172A] outline-none shadow-xs focus:ring-2 focus:ring-[#E69A09]"
               >
                 {monthNamesTh.map((m, idx) => (
                   <option key={idx} value={idx}>{m}</option>
@@ -1771,7 +1769,7 @@ export default function App() {
               <select
                 value={selectedDay}
                 onChange={(e) => setSelectedDay(e.target.value)}
-                className="bg-white border border-[#E8DFE1] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#1F1716] outline-none shadow-xs focus:ring-2 focus:ring-[#800020]"
+                className="bg-white border border-[#E2E8F0] px-3.5 py-2.5 rounded-2xl text-xs font-black text-[#0F172A] outline-none shadow-xs focus:ring-2 focus:ring-[#E69A09]"
               >
                 <option value="">ทุกวัน (สรุปทั้งเดือน)</option>
                 {Array.from({ length: daysInSelectedMonth }, (_, i) => i + 1).map((d) => (
@@ -1781,17 +1779,17 @@ export default function App() {
 
               <button
                 onClick={() => setIsShiftCloseOpen(true)}
-                className="bg-[#800020] hover:bg-[#5B0015] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer ml-1"
+                className="bg-[#E69A09] hover:bg-[#D97706] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer ml-1"
               >
                 <Receipt size={16} /> สรุปยอดปิดกะประจำวัน
               </button>
             </div>
           </div>
 
-          <div className="mb-6 bg-gradient-to-r from-[#F7F2F3] to-[#F3E9EB] border border-[#800020]/20 p-3.5 rounded-2xl flex justify-between items-center text-xs shadow-xs">
-            <span className="font-extrabold text-[#800020] flex items-center gap-2">
+          <div className="mb-6 bg-gradient-to-r from-[#FEF3C7]/50 to-[#F1F5F9] border border-[#E69A09]/30 p-3.5 rounded-2xl flex justify-between items-center text-xs shadow-xs">
+            <span className="font-extrabold text-[#B45309] flex items-center gap-2">
               <Filter size={15} /> แสดงผลข้อมูลของ:{" "}
-              <span className="text-[#1F1716] font-black">
+              <span className="text-[#0F172A] font-black">
                 {selectedDay ? `วันที่ ${selectedDay} ` : "รวมทั้งเดือน "}
                 {monthNamesTh[selectedMonth]} {Number(selectedYear) + 543}
               </span>
@@ -1799,7 +1797,7 @@ export default function App() {
             {selectedDay !== "" && (
               <button
                 onClick={() => setSelectedDay("")}
-                className="text-[11px] text-[#800020] font-black underline hover:text-[#5B0015] cursor-pointer"
+                className="text-[11px] text-[#E69A09] font-black underline hover:text-[#B45309] cursor-pointer"
               >
                 [แสดงทั้งเดือน]
               </button>
@@ -1807,91 +1805,91 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-5 gap-5 mb-8">
-            <div className="bg-white p-5 rounded-3xl border border-[#E8DFE1] shadow-xs flex justify-between items-center">
+            <div className="bg-white p-5 rounded-3xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black text-[#736366] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-black text-[#64748B] uppercase tracking-wider mb-1">
                   {selectedDay ? "รายได้วันที่เลือก" : "รายได้รวมเดือนนี้"}
                 </p>
-                <h3 className="text-2xl font-black text-[#800020]">
+                <h3 className="text-2xl font-black text-[#E69A09]">
                   ฿{filterRevenue.toFixed(2)}
                 </h3>
               </div>
-              <div className="p-3 bg-[#F7F2F3] text-[#800020] rounded-2xl">
+              <div className="p-3 bg-[#FEF3C7] text-[#B45309] rounded-2xl">
                 <TrendingUp size={20} />
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-[#E8DFE1] shadow-xs flex justify-between items-center">
+            <div className="bg-white p-5 rounded-3xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black text-[#736366] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-black text-[#64748B] uppercase tracking-wider mb-1">
                   {selectedDay ? "รายจ่ายวันที่เลือก" : "รายจ่ายรวมเดือนนี้"}
                 </p>
-                <h3 className="text-2xl font-black text-[#D32F2F]">
+                <h3 className="text-2xl font-black text-[#EF4444]">
                   ฿{filterExpenses.toFixed(2)}
                 </h3>
               </div>
-              <div className="p-3 bg-[#FDF2F2] text-[#D32F2F] rounded-2xl">
+              <div className="p-3 bg-[#FEF2F2] text-[#EF4444] rounded-2xl">
                 <Wallet size={20} />
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-[#E8DFE1] shadow-xs flex justify-between items-center">
+            <div className="bg-white p-5 rounded-3xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black text-[#736366] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-black text-[#64748B] uppercase tracking-wider mb-1">
                   กำไรสุทธิ (Net Profit)
                 </p>
                 <h3
                   className={`text-2xl font-black ${
-                    filterNetProfit >= 0 ? "text-[#2E6F40]" : "text-[#D32F2F]"
+                    filterNetProfit >= 0 ? "text-[#10B981]" : "text-[#EF4444]"
                   }`}
                 >
                   ฿{filterNetProfit.toFixed(2)}
                 </h3>
               </div>
-              <div className="p-3 bg-[#EAF4ED] text-[#2E6F40] rounded-2xl">
+              <div className="p-3 bg-[#D1FAE5] text-[#10B981] rounded-2xl">
                 <DollarSign size={20} />
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-[#E8DFE1] shadow-xs flex justify-between items-center">
+            <div className="bg-white p-5 rounded-3xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black text-[#736366] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-black text-[#64748B] uppercase tracking-wider mb-1">
                   จำนวนออเดอร์
                 </p>
-                <h3 className="text-2xl font-black text-[#1F1716]">
+                <h3 className="text-2xl font-black text-[#0F172A]">
                   {filterOrdersCount}{" "}
-                  <span className="text-xs font-semibold text-[#736366]">
+                  <span className="text-xs font-semibold text-[#64748B]">
                     ออเดอร์
                   </span>
                 </h3>
               </div>
-              <div className="p-3 bg-[#F7F2F3] text-[#4D3F42] rounded-2xl">
+              <div className="p-3 bg-[#F1F5F9] text-[#334155] rounded-2xl">
                 <ShoppingBag size={20} />
               </div>
             </div>
 
-            <div className="bg-[#F7F2F3] p-5 rounded-3xl border border-[#E8DFE1] shadow-xs flex justify-between items-center">
+            <div className="bg-[#FEF3C7]/40 p-5 rounded-3xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black text-[#736366] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-black text-[#64748B] uppercase tracking-wider mb-1">
                   เฉลี่ย / ออเดอร์
                 </p>
-                <h3 className="text-2xl font-black text-[#1F1716]">
+                <h3 className="text-2xl font-black text-[#0F172A]">
                   ฿{filterAvgValue.toFixed(0)}
                 </h3>
               </div>
-              <div className="p-3 bg-white text-[#800020] rounded-2xl shadow-xs">
+              <div className="p-3 bg-white text-[#E69A09] rounded-2xl shadow-xs">
                 <ArrowUpRight size={20} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs mb-8">
+          <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs mb-8">
             <div className="flex justify-between items-center mb-5">
-              <h3 className="text-sm font-black text-[#1F1716] flex items-center gap-2">
-                <Calendar size={17} className="text-[#800020]" /> 
+              <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
+                <Calendar size={17} className="text-[#E69A09]" /> 
                 รายงานสรุปรายรับ - รายจ่าย รายวัน (ประจำเดือน {monthNamesTh[selectedMonth]} {Number(selectedYear) + 543})
               </h3>
-              <span className="text-[11px] font-bold text-[#736366]">
+              <span className="text-[11px] font-bold text-[#64748B]">
                 คลิกเพื่อเลือกเจาะลึกดูสินค้าขายดีเฉพาะวันได้
               </span>
             </div>
@@ -1899,7 +1897,7 @@ export default function App() {
             <div className="overflow-x-auto max-h-68 overflow-y-auto pr-1 custom-scrollbar">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="sticky top-0 bg-white z-10">
-                  <tr className="border-b border-[#F7F2F3] text-[#736366] font-bold uppercase">
+                  <tr className="border-b border-[#F1F5F9] text-[#64748B] font-bold uppercase">
                     <th className="pb-3">วันที่</th>
                     <th className="pb-3 text-center">จำนวนออเดอร์</th>
                     <th className="pb-3 text-right">รายรับ (ยอดขาย)</th>
@@ -1908,25 +1906,25 @@ export default function App() {
                     <th className="pb-3 text-center">การกระทำ</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#F7F2F3]">
+                <tbody className="divide-y divide-[#F1F5F9]">
                   {dailyBreakdown.map((item) => (
                     <tr
                       key={item.day}
-                      className={`hover:bg-[#FCFAFA] transition ${Number(selectedDay) === item.day ? "bg-[#F7F2F3]/70 font-bold" : ""}`}
+                      className={`hover:bg-[#F8FAFC] transition ${Number(selectedDay) === item.day ? "bg-[#FEF3C7]/50 font-bold" : ""}`}
                     >
-                      <td className="py-2.5 font-bold text-[#1F1716]">
+                      <td className="py-2.5 font-bold text-[#0F172A]">
                         วันที่ {item.day} {monthNamesTh[selectedMonth]}
                       </td>
-                      <td className="py-2.5 text-center text-[#736366] font-semibold">{item.ordersCount} ออเดอร์</td>
-                      <td className="py-2.5 text-right font-black text-[#800020]">฿{item.revenue.toFixed(2)}</td>
-                      <td className="py-2.5 text-right font-black text-[#D32F2F]">฿{item.expense.toFixed(2)}</td>
-                      <td className={`py-2.5 text-right font-black ${item.profit >= 0 ? "text-[#2E6F40]" : "text-[#D32F2F]"}`}>
+                      <td className="py-2.5 text-center text-[#64748B] font-semibold">{item.ordersCount} ออเดอร์</td>
+                      <td className="py-2.5 text-right font-black text-[#E69A09]">฿{item.revenue.toFixed(2)}</td>
+                      <td className="py-2.5 text-right font-black text-[#EF4444]">฿{item.expense.toFixed(2)}</td>
+                      <td className={`py-2.5 text-right font-black ${item.profit >= 0 ? "text-[#10B981]" : "text-[#EF4444]"}`}>
                         ฿{item.profit.toFixed(2)}
                       </td>
                       <td className="py-2.5 text-center">
                         <button
                           onClick={() => setSelectedDay(String(item.day))}
-                          className="text-[10px] bg-[#800020] text-white px-3 py-1 rounded-xl hover:bg-[#5B0015] transition cursor-pointer font-bold"
+                          className="text-[10px] bg-[#E69A09] text-white px-3 py-1 rounded-xl hover:bg-[#D97706] transition cursor-pointer font-bold"
                         >
                           ดูสินค้าขายดีวันนี้
                         </button>
@@ -1939,12 +1937,12 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-2 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-              <h3 className="text-sm font-black text-[#1F1716] mb-5 flex items-center gap-2">
-                <BarChart3 size={17} className="text-[#800020]" />{" "}
+            <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+              <h3 className="text-sm font-black text-[#0F172A] mb-5 flex items-center gap-2">
+                <BarChart3 size={17} className="text-[#E69A09]" />{" "}
                 ยอดขายย้อนหลัง 7 วันล่าสุด
               </h3>
-              <div className="h-44 flex items-end justify-between gap-3 pt-6 border-b border-[#F7F2F3] pb-2">
+              <div className="h-44 flex items-end justify-between gap-3 pt-6 border-b border-[#F1F5F9] pb-2">
                 {weeklySalesData.map((d, i) => {
                   const barHeightPct =
                     maxWeeklySale > 0 ? (d.sales / maxWeeklySale) * 100 : 0;
@@ -1953,16 +1951,16 @@ export default function App() {
                       key={i}
                       className="flex-1 flex flex-col items-center gap-2 h-full justify-end group"
                     >
-                      <span className="text-[10px] font-black text-[#800020] opacity-0 group-hover:opacity-100 transition duration-200">
+                      <span className="text-[10px] font-black text-[#E69A09] opacity-0 group-hover:opacity-100 transition duration-200">
                         ฿{d.sales}
                       </span>
-                      <div className="w-full max-w-[36px] bg-[#F7F2F3] h-full rounded-t-xl overflow-hidden flex items-end">
+                      <div className="w-full max-w-[36px] bg-[#F1F5F9] h-full rounded-t-xl overflow-hidden flex items-end">
                         <div
-                          className="w-full bg-[#800020] group-hover:bg-[#5B0015] transition-all duration-500 rounded-t-xl"
+                          className="w-full bg-[#E69A09] group-hover:bg-[#D97706] transition-all duration-500 rounded-t-xl"
                           style={{ height: `${Math.max(barHeightPct, 4)}%` }}
                         ></div>
                       </div>
-                      <span className="text-[11px] font-extrabold text-[#736366]">
+                      <span className="text-[11px] font-extrabold text-[#64748B]">
                         {d.day}
                       </span>
                     </div>
@@ -1971,12 +1969,12 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-              <h3 className="text-sm font-black text-[#1F1716] mb-5 flex items-center gap-2">
-                <Calendar size={17} className="text-[#5B0015]" /> ยอดขายย้อนหลัง
+            <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+              <h3 className="text-sm font-black text-[#0F172A] mb-5 flex items-center gap-2">
+                <Calendar size={17} className="text-[#B45309]" /> ยอดขายย้อนหลัง
                 6 เดือน
               </h3>
-              <div className="h-44 flex items-end justify-between gap-3 pt-6 border-b border-[#F7F2F3] pb-2">
+              <div className="h-44 flex items-end justify-between gap-3 pt-6 border-b border-[#F1F5F9] pb-2">
                 {monthlySalesData.map((m, i) => {
                   const barHeightPct =
                     maxMonthlySale > 0 ? (m.sales / maxMonthlySale) * 100 : 0;
@@ -1985,16 +1983,16 @@ export default function App() {
                       key={i}
                       className="flex-1 flex flex-col items-center gap-2 h-full justify-end group"
                     >
-                      <span className="text-[10px] font-black text-[#5B0015] opacity-0 group-hover:opacity-100 transition duration-200">
+                      <span className="text-[10px] font-black text-[#B45309] opacity-0 group-hover:opacity-100 transition duration-200">
                         ฿{m.sales}
                       </span>
-                      <div className="w-full max-w-[36px] bg-[#F7F2F3] h-full rounded-t-xl overflow-hidden flex items-end">
+                      <div className="w-full max-w-[36px] bg-[#F1F5F9] h-full rounded-t-xl overflow-hidden flex items-end">
                         <div
-                          className="w-full bg-[#5B0015] group-hover:bg-[#3B000E] transition-all duration-500 rounded-t-xl"
+                          className="w-full bg-[#B45309] group-hover:bg-[#78350F] transition-all duration-500 rounded-t-xl"
                           style={{ height: `${Math.max(barHeightPct, 4)}%` }}
                         ></div>
                       </div>
-                      <span className="text-[11px] font-extrabold text-[#736366]">
+                      <span className="text-[11px] font-extrabold text-[#64748B]">
                         {m.monthName}
                       </span>
                     </div>
@@ -2005,20 +2003,20 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-3 gap-6 mb-8">
-            <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
+            <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
               <div className="flex justify-between items-center mb-5">
-                <h3 className="text-sm font-black text-[#1F1716] flex items-center gap-2">
-                  <Award size={17} className="text-[#800020]" />{" "}
+                <h3 className="text-sm font-black text-[#0F172A] flex items-center gap-2">
+                  <Award size={17} className="text-[#E69A09]" />{" "}
                   ตารางอันดับเมนูยอดฮิต (Best Sellers)
                 </h3>
-                <span className="text-[11px] font-black text-[#800020] bg-[#F7F2F3] px-3 py-1 rounded-full border border-[#800020]/20">
+                <span className="text-[11px] font-black text-[#E69A09] bg-[#FEF3C7] px-3 py-1 rounded-full border border-[#E69A09]/20">
                   {selectedDay ? `เฉพาะวันที่ ${selectedDay} ${monthNamesTh[selectedMonth]}` : `รวมทั้งเดือน ${monthNamesTh[selectedMonth]}`}
                 </span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-[#F7F2F3] text-[#736366] font-bold uppercase">
+                    <tr className="border-b border-[#F1F5F9] text-[#64748B] font-bold uppercase">
                       <th className="pb-3">อันดับ</th>
                       <th className="pb-3">สินค้า</th>
                       <th className="pb-3">หมวดหมู่</th>
@@ -2026,20 +2024,20 @@ export default function App() {
                       <th className="pb-3 text-right">ยอดขายรวม</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#F7F2F3]">
+                  <tbody className="divide-y divide-[#F1F5F9]">
                     {filteredBestSellers.length === 0 ? (
                       <tr>
                         <td
                           colSpan={5}
-                          className="py-10 text-center text-[#A8989B]"
+                          className="py-10 text-center text-[#94A3B8]"
                         >
                           ไม่มีข้อมูลการขายในวันที่เลือก
                         </td>
                       </tr>
                     ) : (
                       filteredBestSellers.map((item, idx) => (
-                        <tr key={idx} className="hover:bg-[#FCFAFA]">
-                          <td className="py-3 font-black text-[#800020]">
+                        <tr key={idx} className="hover:bg-[#F8FAFC]">
+                          <td className="py-3 font-black text-[#E69A09]">
                             #{idx + 1}
                           </td>
                           <td className="py-3 flex items-center gap-3">
@@ -2048,17 +2046,17 @@ export default function App() {
                               alt=""
                               className="w-9 h-9 rounded-xl object-cover shadow-xs"
                             />
-                            <span className="font-bold text-[#1F1716]">
+                            <span className="font-bold text-[#0F172A]">
                               {item.name}
                             </span>
                           </td>
-                          <td className="py-3 text-[#736366] capitalize font-semibold">
+                          <td className="py-3 text-[#64748B] capitalize font-semibold">
                             {item.category || "coffee"}
                           </td>
-                          <td className="py-3 text-center font-extrabold text-[#1F1716]">
+                          <td className="py-3 text-center font-extrabold text-[#0F172A]">
                             {item.qty} ชิ้น
                           </td>
-                          <td className="py-3 text-right font-black text-[#800020]">
+                          <td className="py-3 text-right font-black text-[#E69A09]">
                             ฿{item.revenue.toFixed(2)}
                           </td>
                         </tr>
@@ -2069,23 +2067,23 @@ export default function App() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs flex flex-col justify-between">
+            <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
               <div>
-                <h3 className="text-sm font-black text-[#1F1716] mb-5 flex items-center gap-2">
-                  <PieChart size={17} className="text-[#800020]" />{" "}
+                <h3 className="text-sm font-black text-[#0F172A] mb-5 flex items-center gap-2">
+                  <PieChart size={17} className="text-[#E69A09]" />{" "}
                   สัดส่วนยอดขายตามหมวดหมู่
                 </h3>
                 <div className="space-y-4 text-xs">
                   <div>
                     <div className="flex justify-between font-bold mb-1.5">
                       <span>Coffee</span>
-                      <span className="text-[#800020] font-black">
+                      <span className="text-[#E69A09] font-black">
                         ฿{catSales.coffee.toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full bg-[#F7F2F3] h-2.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#F1F5F9] h-2.5 rounded-full overflow-hidden">
                       <div
-                        className="bg-[#800020] h-full transition-all duration-500 rounded-full"
+                        className="bg-[#E69A09] h-full transition-all duration-500 rounded-full"
                         style={{
                           width: `${filterRevenue > 0 ? (catSales.coffee / filterRevenue) * 100 : 0}%`,
                         }}
@@ -2096,13 +2094,13 @@ export default function App() {
                   <div>
                     <div className="flex justify-between font-bold mb-1.5">
                       <span>Non-Coffee</span>
-                      <span className="text-[#800020] font-black">
+                      <span className="text-[#E69A09] font-black">
                         ฿{catSales["non-coffee"].toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full bg-[#F7F2F3] h-2.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#F1F5F9] h-2.5 rounded-full overflow-hidden">
                       <div
-                        className="bg-[#A31B38] h-full transition-all duration-500 rounded-full"
+                        className="bg-[#B45309] h-full transition-all duration-500 rounded-full"
                         style={{
                           width: `${filterRevenue > 0 ? (catSales["non-coffee"] / filterRevenue) * 100 : 0}%`,
                         }}
@@ -2113,13 +2111,13 @@ export default function App() {
                   <div>
                     <div className="flex justify-between font-bold mb-1.5">
                       <span>Bakery</span>
-                      <span className="text-[#800020] font-black">
+                      <span className="text-[#E69A09] font-black">
                         ฿{catSales.bakery.toFixed(2)}
                       </span>
                     </div>
-                    <div className="w-full bg-[#F7F2F3] h-2.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#F1F5F9] h-2.5 rounded-full overflow-hidden">
                       <div
-                        className="bg-[#4A0A18] h-full transition-all duration-500 rounded-full"
+                        className="bg-[#475569] h-full transition-all duration-500 rounded-full"
                         style={{
                           width: `${filterRevenue > 0 ? (catSales.bakery / filterRevenue) * 100 : 0}%`,
                         }}
@@ -2131,14 +2129,14 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-            <h3 className="text-sm font-black text-[#1F1716] mb-5 flex items-center gap-2">
-              <Clock size={17} className="text-[#800020]" /> ประวัติคำสั่งซื้อ (
+          <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+            <h3 className="text-sm font-black text-[#0F172A] mb-5 flex items-center gap-2">
+              <Clock size={17} className="text-[#E69A09]" /> ประวัติคำสั่งซื้อ (
               {filteredDashboardOrders.length} รายการ)
             </h3>
             <div className="space-y-3">
               {filteredDashboardOrders.length === 0 ? (
-                <div className="p-10 text-center text-[#A8989B] text-xs font-semibold">
+                <div className="p-10 text-center text-[#94A3B8] text-xs font-semibold">
                   ไม่มีประวัติการชำระเงินในช่วงเวลานี้
                 </div>
               ) : (
@@ -2147,31 +2145,31 @@ export default function App() {
                     key={order.id}
                     className={`p-4 rounded-2xl border flex justify-between items-center transition ${
                       order.status === "cancelled"
-                        ? "bg-[#FDF2F2] border-[#F8D7D7] opacity-70"
-                        : "bg-[#FCFAFA] border-[#F7F2F3] hover:border-[#800020]"
+                        ? "bg-[#FEF2F2] border-[#FCA5A5] opacity-70"
+                        : "bg-[#F8FAFC] border-[#F1F5F9] hover:border-[#E69A09]"
                     }`}
                   >
                     <div>
                       <div className="flex items-center gap-2.5">
-                        <span className="font-black text-xs text-[#800020] bg-[#F7F2F3] px-2.5 py-0.5 rounded-lg border border-[#800020]/20">
+                        <span className="font-black text-xs text-[#E69A09] bg-[#FEF3C7] px-2.5 py-0.5 rounded-lg border border-[#E69A09]/20">
                           {order.queueNo}
                         </span>
-                        <span className="font-extrabold text-xs text-[#1F1716]">
+                        <span className="font-extrabold text-xs text-[#0F172A]">
                           {order.id}
                         </span>
-                        <span className="text-[10px] bg-[#800020] text-white px-2.5 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] bg-[#E69A09] text-white px-2.5 py-0.5 rounded-full font-bold">
                           {order.orderType}
                         </span>
-                        <span className="text-[10px] bg-[#F7F2F3] text-[#800020] px-2.5 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] bg-[#F1F5F9] text-[#B45309] px-2.5 py-0.5 rounded-full font-bold">
                           {order.paymentMethod}
                         </span>
                         {order.status === "cancelled" && (
-                          <span className="text-[10px] bg-[#D32F2F] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                          <span className="text-[10px] bg-[#EF4444] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
                             <Ban size={10} /> ยกเลิกแล้ว (ไม่คิดเงิน/ตัดสต็อก)
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-[#736366] font-medium mt-1">
+                      <p className="text-[11px] text-[#64748B] font-medium mt-1">
                         {order.date} {order.time} • {order.items.length} รายการ
                       </p>
                     </div>
@@ -2179,15 +2177,15 @@ export default function App() {
                       <p
                         className={`text-base font-black ${
                           order.status === "cancelled"
-                            ? "line-through text-[#A8989B]"
-                            : "text-[#800020]"
+                            ? "line-through text-[#94A3B8]"
+                            : "text-[#E69A09]"
                         }`}
                       >
                         ฿{order.total.toFixed(2)}
                       </p>
                       <button
                         onClick={() => setActiveReceipt(order)}
-                        className="text-[11px] text-[#736366] font-extrabold underline hover:text-[#800020] mt-0.5 cursor-pointer"
+                        className="text-[11px] text-[#64748B] font-extrabold underline hover:text-[#E69A09] mt-0.5 cursor-pointer"
                       >
                         ดูใบเสร็จ
                       </button>
@@ -2202,31 +2200,31 @@ export default function App() {
 
       {/* Admin Screen */}
       {activeTab === "admin" && (
-        <main className="flex-1 p-8 bg-[#FAF8F5] overflow-y-auto custom-scrollbar">
+        <main className="flex-1 p-8 bg-[#F8FAFC] overflow-y-auto custom-scrollbar">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-black text-[#1F1716] flex items-center gap-2.5">
-                <ShieldAlert size={24} className="text-[#800020]" /> COE Admin Management
+              <h1 className="text-2xl font-black text-[#0F172A] flex items-center gap-2.5">
+                <ShieldAlert size={24} className="text-[#E69A09]" /> SWEET GEAR Admin Management
               </h1>
-              <p className="text-xs font-semibold text-[#736366] mt-1">
+              <p className="text-xs font-semibold text-[#64748B] mt-1">
                 จัดการระบบทั้งหมด: สินค้า, สต็อกวัตถุดิบ, โปรโมชั่น และรายจ่าย
               </p>
             </div>
             <button
               onClick={() => setIsLogoutModalOpen(true)}
-              className="text-xs font-bold text-[#D32F2F] bg-[#FDF2F2] hover:bg-[#F8D7D7] border border-[#F8D7D7] px-4 py-2.5 rounded-2xl transition cursor-pointer shadow-xs"
+              className="text-xs font-bold text-[#EF4444] bg-[#FEF2F2] hover:bg-[#FCA5A5]/30 border border-[#FCA5A5] px-4 py-2.5 rounded-2xl transition cursor-pointer shadow-xs"
             >
               ออกจากสิทธิ์ปลดล็อก
             </button>
           </div>
 
-          <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-2xl border border-[#E8DFE1] w-fit shadow-xs">
+          <div className="flex gap-2 mb-6 bg-white p-1.5 rounded-2xl border border-[#E2E8F0] w-fit shadow-xs">
             <button
               onClick={() => setAdminSubTab("menu")}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
                 adminSubTab === "menu"
-                  ? "bg-[#800020] text-white shadow-xs"
-                  : "text-[#736366] hover:text-[#1F1716]"
+                  ? "bg-[#E69A09] text-white shadow-xs"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
             >
               <Layers size={16} /> จัดการเมนูสินค้า
@@ -2235,8 +2233,8 @@ export default function App() {
               onClick={() => setAdminSubTab("inventory")}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
                 adminSubTab === "inventory"
-                  ? "bg-[#800020] text-white shadow-xs"
-                  : "text-[#736366] hover:text-[#1F1716]"
+                  ? "bg-[#E69A09] text-white shadow-xs"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
             >
               <Package size={16} /> จัดการคลังวัตถุดิบ & สต็อก
@@ -2245,8 +2243,8 @@ export default function App() {
               onClick={() => setAdminSubTab("promotions")}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
                 adminSubTab === "promotions"
-                  ? "bg-[#800020] text-white shadow-xs"
-                  : "text-[#736366] hover:text-[#1F1716]"
+                  ? "bg-[#E69A09] text-white shadow-xs"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
             >
               <Tag size={16} /> จัดการโปรโมชั่น
@@ -2255,8 +2253,8 @@ export default function App() {
               onClick={() => setAdminSubTab("expenses")}
               className={`px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-2 cursor-pointer ${
                 adminSubTab === "expenses"
-                  ? "bg-[#800020] text-white shadow-xs"
-                  : "text-[#736366] hover:text-[#1F1716]"
+                  ? "bg-[#E69A09] text-white shadow-xs"
+                  : "text-[#64748B] hover:text-[#0F172A]"
               }`}
             >
               <Wallet size={16} /> จัดการรายจ่าย & วัตถุดิบ
@@ -2265,13 +2263,13 @@ export default function App() {
 
           {adminSubTab === "menu" && (
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs h-fit space-y-4">
-                <h2 className="text-base font-black text-[#1F1716]">
+              <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs h-fit space-y-4">
+                <h2 className="text-base font-black text-[#0F172A]">
                   {editingItem ? "แก้ไขรายการสินค้า" : "เพิ่มสินค้าใหม่"}
                 </h2>
                 <form onSubmit={handleSaveItem} className="space-y-4 text-xs">
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       ชื่อสินค้า
                     </label>
                     <input
@@ -2281,14 +2279,14 @@ export default function App() {
                       onChange={(e) =>
                         setItemForm({ ...itemForm, name: e.target.value })
                       }
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] transition font-semibold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#E69A09] outline-none text-[#0F172A] transition font-semibold"
                       placeholder="เช่น Matcha Espresso Latte"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         หมวดหมู่หลัก
                       </label>
                       <select
@@ -2303,7 +2301,7 @@ export default function App() {
                             subCategory: firstSub,
                           });
                         }}
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-bold transition"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#E69A09] outline-none text-[#0F172A] font-bold transition"
                       >
                         <option value="coffee">Coffee</option>
                         <option value="non-coffee">Non-Coffee</option>
@@ -2313,7 +2311,7 @@ export default function App() {
 
                     {adminSelectedCategoryObj?.subCategories && (
                       <div>
-                        <label className="font-extrabold text-[#4D3F42] block mb-1">
+                        <label className="font-extrabold text-[#334155] block mb-1">
                           หมวดหมู่ย่อย
                         </label>
                         <select
@@ -2321,7 +2319,7 @@ export default function App() {
                           onChange={(e) =>
                             setItemForm({ ...itemForm, subCategory: e.target.value })
                           }
-                          className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-bold transition"
+                          className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#E69A09] outline-none text-[#0F172A] font-bold transition"
                         >
                           {adminSelectedCategoryObj.subCategories
                             .filter((sub) => sub.id !== "all")
@@ -2336,9 +2334,9 @@ export default function App() {
                   </div>
 
                   {/* สลับรูปแบบราคา & ไซส์ */}
-                  <div className="bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] space-y-3">
+                  <div className="bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-3">
                     <div className="flex justify-between items-center">
-                      <label className="font-extrabold text-[#4D3F42]">
+                      <label className="font-extrabold text-[#334155]">
                         การตั้งค่าขนาดแก้ว & ราคา
                       </label>
                       <button
@@ -2346,8 +2344,8 @@ export default function App() {
                         onClick={() => setHasMultipleSizes(!hasMultipleSizes)}
                         className={`text-[11px] font-black px-3 py-1 rounded-xl transition cursor-pointer ${
                           hasMultipleSizes
-                            ? "bg-[#800020] text-white"
-                            : "bg-[#E8DFE1] text-[#736366]"
+                            ? "bg-[#E69A09] text-white"
+                            : "bg-[#E2E8F0] text-[#64748B]"
                         }`}
                       >
                         {hasMultipleSizes ? "มีหลายขนาดแก้ว" : "ขนาดเดียว (Standard)"}
@@ -2356,7 +2354,7 @@ export default function App() {
 
                     {!hasMultipleSizes ? (
                       <div>
-                        <label className="font-bold text-[#736366] block mb-1">
+                        <label className="font-bold text-[#64748B] block mb-1">
                           ราคา (บาท)
                         </label>
                         <input
@@ -2366,12 +2364,12 @@ export default function App() {
                           onChange={(e) =>
                             setItemForm({ ...itemForm, price: e.target.value })
                           }
-                          className="w-full p-3 bg-white border border-[#E8DFE1] rounded-xl focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716] font-black"
+                          className="w-full p-3 bg-white border border-[#E2E8F0] rounded-xl focus:ring-2 focus:ring-[#E69A09] outline-none text-[#0F172A] font-black"
                           placeholder="60"
                         />
                       </div>
                     ) : (
-                      <div className="space-y-3 pt-1 border-t border-[#E8DFE1]">
+                      <div className="space-y-3 pt-1 border-t border-[#E2E8F0]">
                         <div className="space-y-1.5">
                           {itemForm.sizes && itemForm.sizes.length > 0 ? (
                             itemForm.sizes.map((sz, idx) => (
@@ -2379,19 +2377,19 @@ export default function App() {
                                 key={sz.id || idx}
                                 className={`p-2.5 rounded-xl border flex justify-between items-center transition cursor-pointer ${
                                   selectedSizeIdxForRecipe === idx
-                                    ? "bg-white border-[#800020] shadow-xs"
-                                    : "bg-white/60 border-[#E8DFE1]"
+                                    ? "bg-white border-[#E69A09] shadow-xs"
+                                    : "bg-white/60 border-[#E2E8F0]"
                                 }`}
                                 onClick={() => setSelectedSizeIdxForRecipe(idx)}
                               >
                                 <div className="flex items-center gap-2">
-                                  <span className="font-black text-xs text-[#1F1716]">
+                                  <span className="font-black text-xs text-[#0F172A]">
                                     {sz.name}
                                   </span>
-                                  <span className="text-[10px] font-bold text-[#800020] bg-[#F7F2F3] px-2 py-0.5 rounded-md">
+                                  <span className="text-[10px] font-bold text-[#E69A09] bg-[#FEF3C7] px-2 py-0.5 rounded-md">
                                     ฿{sz.price}
                                   </span>
-                                  <span className="text-[10px] text-[#736366]">
+                                  <span className="text-[10px] text-[#64748B]">
                                     ({sz.recipe?.length || 0} วัตถุดิบ)
                                   </span>
                                 </div>
@@ -2401,14 +2399,14 @@ export default function App() {
                                     e.stopPropagation();
                                     handleRemoveSize(idx);
                                   }}
-                                  className="text-[#A8989B] hover:text-[#D32F2F] p-1"
+                                  className="text-[#94A3B8] hover:text-[#EF4444] p-1"
                                 >
                                   <X size={14} />
                                 </button>
                               </div>
                             ))
                           ) : (
-                            <p className="text-[11px] text-[#A8989B] italic">
+                            <p className="text-[11px] text-[#94A3B8] italic">
                               ยังไม่ได้เพิ่มขนาดแก้ว
                             </p>
                           )}
@@ -2420,20 +2418,20 @@ export default function App() {
                             value={newSizeName}
                             onChange={(e) => setNewSizeName(e.target.value)}
                             placeholder="เช่น 16 oz, 22 oz, Hot 8oz"
-                            className="p-2 bg-white border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                            className="p-2 bg-white border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                           />
                           <input
                             type="number"
                             value={newSizePrice}
                             onChange={(e) => setNewSizePrice(e.target.value)}
                             placeholder="ราคา (เช่น 65)"
-                            className="p-2 bg-white border border-[#E8DFE1] rounded-lg text-xs outline-none font-black"
+                            className="p-2 bg-white border border-[#E2E8F0] rounded-lg text-xs outline-none font-black"
                           />
                         </div>
                         <button
                           type="button"
                           onClick={handleAddNewSize}
-                          className="w-full bg-[#800020] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#5B0015] transition"
+                          className="w-full bg-[#E69A09] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#D97706] transition"
                         >
                           + เพิ่มขนาดแก้วนี้
                         </button>
@@ -2442,10 +2440,10 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       สถานะสินค้า
                     </label>
-                    <div className="grid grid-cols-2 gap-2 p-1 bg-[#F7F2F3] rounded-xl">
+                    <div className="grid grid-cols-2 gap-2 p-1 bg-[#F1F5F9] rounded-xl">
                       <button
                         type="button"
                         onClick={() =>
@@ -2453,8 +2451,8 @@ export default function App() {
                         }
                         className={`py-2 rounded-lg font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
                           itemForm.inStock
-                            ? "bg-white text-[#800020] shadow-xs"
-                            : "text-[#736366]"
+                            ? "bg-white text-[#E69A09] shadow-xs"
+                            : "text-[#64748B]"
                         }`}
                       >
                         <CheckCircle2 size={14} /> พร้อมขาย
@@ -2466,8 +2464,8 @@ export default function App() {
                         }
                         className={`py-2 rounded-lg font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
                           !itemForm.inStock
-                            ? "bg-white text-[#D32F2F] shadow-xs"
-                            : "text-[#736366]"
+                            ? "bg-white text-[#EF4444] shadow-xs"
+                            : "text-[#64748B]"
                         }`}
                       >
                         <XCircle size={14} /> สินค้าหมด
@@ -2476,8 +2474,8 @@ export default function App() {
                   </div>
 
                   {/* สูตรวัตถุดิบตัดสต็อก */}
-                  <div className="bg-[#FCFAFA] p-4 rounded-2xl border border-[#E8DFE1] space-y-2.5">
-                    <label className="font-extrabold text-[#4D3F42] block">
+                  <div className="bg-[#F8FAFC] p-4 rounded-2xl border border-[#E2E8F0] space-y-2.5">
+                    <label className="font-extrabold text-[#334155] block">
                       {hasMultipleSizes && itemForm.sizes?.length > 0
                         ? `สูตรวัตถุดิบตัดสต็อกสำหรับขนาด [ ${itemForm.sizes[selectedSizeIdxForRecipe]?.name || ""} ]`
                         : "สูตรวัตถุดิบตัดสต็อก (ต่อ 1 แก้ว)"}
@@ -2491,19 +2489,19 @@ export default function App() {
                             return (
                               <div
                                 key={r.ingId}
-                                className="flex justify-between items-center bg-white border border-[#E8DFE1] px-3 py-2 rounded-xl"
+                                className="flex justify-between items-center bg-white border border-[#E2E8F0] px-3 py-2 rounded-xl"
                               >
-                                <span className="font-bold text-[#1F1716]">
+                                <span className="font-bold text-[#0F172A]">
                                   {ing ? ing.name : r.ingId}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-black text-[#800020]">
+                                  <span className="font-black text-[#E69A09]">
                                     {r.amount} {ing?.unit}
                                   </span>
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveIngFromSingleRecipe(r.ingId)}
-                                    className="text-[#A8989B] hover:text-[#D32F2F]"
+                                    className="text-[#94A3B8] hover:text-[#EF4444]"
                                   >
                                     <X size={14} />
                                   </button>
@@ -2512,7 +2510,7 @@ export default function App() {
                             );
                           })
                         ) : (
-                          <p className="text-[11px] text-[#A8989B] italic font-medium">
+                          <p className="text-[11px] text-[#94A3B8] italic font-medium">
                             ยังไม่ได้กำหนดวัตถุดิบในสูตร
                           </p>
                         )
@@ -2523,19 +2521,19 @@ export default function App() {
                             return (
                               <div
                                 key={r.ingId}
-                                className="flex justify-between items-center bg-white border border-[#E8DFE1] px-3 py-2 rounded-xl"
+                                className="flex justify-between items-center bg-white border border-[#E2E8F0] px-3 py-2 rounded-xl"
                               >
-                                <span className="font-bold text-[#1F1716]">
+                                <span className="font-bold text-[#0F172A]">
                                   {ing ? ing.name : r.ingId}
                                 </span>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-black text-[#800020]">
+                                  <span className="font-black text-[#E69A09]">
                                     {r.amount} {ing?.unit}
                                   </span>
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveIngFromSizeRecipe(selectedSizeIdxForRecipe, r.ingId)}
-                                    className="text-[#A8989B] hover:text-[#D32F2F]"
+                                    className="text-[#94A3B8] hover:text-[#EF4444]"
                                   >
                                     <X size={14} />
                                   </button>
@@ -2544,21 +2542,21 @@ export default function App() {
                             );
                           })
                         ) : (
-                          <p className="text-[11px] text-[#A8989B] italic font-medium">
+                          <p className="text-[11px] text-[#94A3B8] italic font-medium">
                             ยังไม่ได้กำหนดวัตถุดิบในสูตรของขนาดนี้
                           </p>
                         )
                       )}
                     </div>
 
-                    <div className="pt-2 border-t border-[#E8DFE1] space-y-2">
+                    <div className="pt-2 border-t border-[#E2E8F0] space-y-2">
                       <div className="grid grid-cols-2 gap-2">
                         <select
                           value={selectedIngForRecipe}
                           onChange={(e) =>
                             setSelectedIngForRecipe(e.target.value)
                           }
-                          className="p-2.5 bg-white border border-[#E8DFE1] rounded-xl text-xs font-semibold outline-none"
+                          className="p-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold outline-none"
                         >
                           <option value="">-- เลือกวัตถุดิบ --</option>
                           {ingredients.map((ing) => (
@@ -2573,14 +2571,14 @@ export default function App() {
                           value={recipeIngAmount}
                           onChange={(e) => setRecipeIngAmount(e.target.value)}
                           placeholder="ปริมาณที่ใช้"
-                          className="p-2.5 bg-white border border-[#E8DFE1] rounded-xl text-xs font-bold outline-none"
+                          className="p-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold outline-none"
                         />
                       </div>
 
                       <button
                         type="button"
                         onClick={hasMultipleSizes ? handleAddIngToSizeRecipe : handleAddIngToSingleRecipe}
-                        className="w-full bg-[#800020] text-white font-bold py-2.5 rounded-xl text-xs hover:bg-[#5B0015] transition cursor-pointer"
+                        className="w-full bg-[#E69A09] text-white font-bold py-2.5 rounded-xl text-xs hover:bg-[#D97706] transition cursor-pointer"
                       >
                         + เพิ่มวัตถุดิบในสูตร
                       </button>
@@ -2588,8 +2586,8 @@ export default function App() {
                   </div>
 
                   {/* ระดับความหวาน */}
-                  <div className="bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] space-y-2">
-                    <label className="font-extrabold text-[#4D3F42] block">
+                  <div className="bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
+                    <label className="font-extrabold text-[#334155] block">
                       ระดับความหวาน
                     </label>
                     <div className="flex flex-wrap gap-1.5">
@@ -2597,7 +2595,7 @@ export default function App() {
                         itemForm.sweetnessText.split(",").map((sw, idx) => (
                           <span
                             key={idx}
-                            className="bg-white border border-[#E8DFE1] px-2.5 py-1 rounded-lg text-[#1F1716] font-medium flex items-center gap-1 shadow-xs"
+                            className="bg-white border border-[#E2E8F0] px-2.5 py-1 rounded-lg text-[#0F172A] font-medium flex items-center gap-1 shadow-xs"
                           >
                             {sw.trim()}
                             <button
@@ -2612,14 +2610,14 @@ export default function App() {
                                   sweetnessText: list.join(", "),
                                 });
                               }}
-                              className="text-[#A8989B] hover:text-[#D32F2F]"
+                              className="text-[#94A3B8] hover:text-[#EF4444]"
                             >
                               <X size={12} />
                             </button>
                           </span>
                         ))
                       ) : (
-                        <span className="text-[#A8989B] text-[11px]">
+                        <span className="text-[#94A3B8] text-[11px]">
                           ไม่มีตัวเลือก
                         </span>
                       )}
@@ -2630,12 +2628,12 @@ export default function App() {
                         value={newSweetness}
                         onChange={(e) => setNewSweetness(e.target.value)}
                         placeholder="เพิ่มออปชัน (เช่น 25%)"
-                        className="flex-1 bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                        className="flex-1 bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                       />
                       <button
                         type="button"
                         onClick={addSweetnessOption}
-                        className="bg-[#800020] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
+                        className="bg-[#E69A09] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
                       >
                         + เพิ่ม
                       </button>
@@ -2643,8 +2641,8 @@ export default function App() {
                   </div>
 
                   {/* ตัวเลือกนม & ราคาเพิ่ม */}
-                  <div className="bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] space-y-2">
-                    <label className="font-extrabold text-[#4D3F42] block">
+                  <div className="bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
+                    <label className="font-extrabold text-[#334155] block">
                       ตัวเลือกนม & ราคาเพิ่ม
                     </label>
                     <div className="flex flex-wrap gap-1.5">
@@ -2652,7 +2650,7 @@ export default function App() {
                         itemForm.milkText.split(",").map((m, idx) => (
                           <span
                             key={idx}
-                            className="bg-white border border-[#E8DFE1] px-2.5 py-1 rounded-lg text-[#1F1716] font-medium flex items-center gap-1 shadow-xs"
+                            className="bg-white border border-[#E2E8F0] px-2.5 py-1 rounded-lg text-[#0F172A] font-medium flex items-center gap-1 shadow-xs"
                           >
                             {m.trim()}
                             <button
@@ -2667,14 +2665,14 @@ export default function App() {
                                   milkText: list.join(", "),
                                 });
                               }}
-                              className="text-[#A8989B] hover:text-[#D32F2F]"
+                              className="text-[#94A3B8] hover:text-[#EF4444]"
                             >
                               <X size={12} />
                             </button>
                           </span>
                         ))
                       ) : (
-                        <span className="text-[#A8989B] text-[11px]">
+                        <span className="text-[#94A3B8] text-[11px]">
                           ไม่มีตัวเลือก
                         </span>
                       )}
@@ -2685,12 +2683,12 @@ export default function App() {
                         value={newMilk}
                         onChange={(e) => setNewMilk(e.target.value)}
                         placeholder="เช่น นมพิสตาชิโอ (+25)"
-                        className="flex-1 bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                        className="flex-1 bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                       />
                       <button
                         type="button"
                         onClick={addMilkOption}
-                        className="bg-[#800020] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
+                        className="bg-[#E69A09] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
                       >
                         + เพิ่ม
                       </button>
@@ -2698,8 +2696,8 @@ export default function App() {
                   </div>
 
                   {/* ท็อปปิ้ง / ตัวเลือกเพิ่มเติม */}
-                  <div className="bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#E8DFE1] space-y-2">
-                    <label className="font-extrabold text-[#4D3F42] block">
+                  <div className="bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
+                    <label className="font-extrabold text-[#334155] block">
                       ท็อปปิ้ง / ตัวเลือกเพิ่มเติม (พร้อมการผูกตัดสต็อก)
                     </label>
                     <div className="flex flex-wrap gap-1.5 mb-2">
@@ -2707,7 +2705,7 @@ export default function App() {
                         itemForm.addonsText.split(",").map((a, idx) => (
                           <span
                             key={idx}
-                            className="bg-white border border-[#E8DFE1] px-2.5 py-1 rounded-lg text-[#1F1716] font-medium flex items-center gap-1 shadow-xs text-[11px]"
+                            className="bg-white border border-[#E2E8F0] px-2.5 py-1 rounded-lg text-[#0F172A] font-medium flex items-center gap-1 shadow-xs text-[11px]"
                           >
                             {a.trim()}
                             <button
@@ -2722,34 +2720,34 @@ export default function App() {
                                   addonsText: list.join(", "),
                                 });
                               }}
-                              className="text-[#A8989B] hover:text-[#D32F2F]"
+                              className="text-[#94A3B8] hover:text-[#EF4444]"
                             >
                               <X size={12} />
                             </button>
                           </span>
                         ))
                       ) : (
-                        <span className="text-[#A8989B] text-[11px]">
+                        <span className="text-[#94A3B8] text-[11px]">
                           ไม่มีตัวเลือกท็อปปิ้ง
                         </span>
                       )}
                     </div>
 
-                    <div className="space-y-2 pt-1 border-t border-[#E8DFE1]">
+                    <div className="space-y-2 pt-1 border-t border-[#E2E8F0]">
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
                           value={addonName}
                           onChange={(e) => setAddonName(e.target.value)}
                           placeholder="ชื่อท็อปปิ้ง (เช่น วิปครีม)"
-                          className="bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                          className="bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                         />
                         <input
                           type="number"
                           value={addonPrice}
                           onChange={(e) => setAddonPrice(e.target.value)}
                           placeholder="ราคาบวกเพิ่ม (เช่น 15)"
-                          className="bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                          className="bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                         />
                       </div>
 
@@ -2757,7 +2755,7 @@ export default function App() {
                         <select
                           value={selectedAddonIng}
                           onChange={(e) => setSelectedAddonIng(e.target.value)}
-                          className="bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                          className="bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                         >
                           <option value="">-- ไม่ตัดวัตถุดิบเพิ่มเติม --</option>
                           {ingredients.map((ing) => (
@@ -2771,14 +2769,14 @@ export default function App() {
                           value={addonIngAmount}
                           onChange={(e) => setAddonIngAmount(e.target.value)}
                           placeholder="ปริมาณที่ใช้ตัดสต็อก"
-                          className="bg-white p-2 border border-[#E8DFE1] rounded-lg text-xs outline-none font-semibold"
+                          className="bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
                         />
                       </div>
 
                       <button
                         type="button"
                         onClick={handleAddAddonOption}
-                        className="w-full bg-[#800020] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#5B0015] transition"
+                        className="w-full bg-[#E69A09] text-white py-2 rounded-lg font-black text-xs cursor-pointer hover:bg-[#D97706] transition"
                       >
                         + เพิ่มท็อปปิ้งในเมนูนี้
                       </button>
@@ -2786,7 +2784,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       URL รูปภาพสินค้า
                     </label>
                     <input
@@ -2795,7 +2793,7 @@ export default function App() {
                       onChange={(e) =>
                         setItemForm({ ...itemForm, image: e.target.value })
                       }
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl focus:bg-white outline-none text-[#1F1716] font-medium"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl focus:bg-white outline-none text-[#0F172A] font-medium"
                       placeholder="https://..."
                     />
                   </div>
@@ -2803,7 +2801,7 @@ export default function App() {
                   <div className="flex gap-2 pt-2">
                     <button
                       type="submit"
-                      className="flex-1 bg-[#800020] hover:bg-[#5B0015] text-white font-black py-3.5 rounded-2xl shadow-md transition text-xs cursor-pointer uppercase tracking-wider"
+                      className="flex-1 bg-[#E69A09] hover:bg-[#D97706] text-white font-black py-3.5 rounded-2xl shadow-md transition text-xs cursor-pointer uppercase tracking-wider"
                     >
                       {editingItem ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}
                     </button>
@@ -2827,7 +2825,7 @@ export default function App() {
                             sizes: [],
                           });
                         }}
-                        className="px-4 border border-[#E8DFE1] rounded-2xl text-[#4D3F42] hover:bg-[#F7F2F3] font-bold text-xs transition cursor-pointer"
+                        className="px-4 border border-[#E2E8F0] rounded-2xl text-[#334155] hover:bg-[#F1F5F9] font-bold text-xs transition cursor-pointer"
                       >
                         ยกเลิก
                       </button>
@@ -2836,14 +2834,14 @@ export default function App() {
                 </form>
               </div>
 
-              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-                <h2 className="text-base font-black text-[#1F1716] mb-5">
+              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+                <h2 className="text-base font-black text-[#0F172A] mb-5">
                   รายการสินค้าทั้งหมด ({menuItems.length} รายการ)
                 </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-[#F7F2F3] text-[#736366] font-bold uppercase">
+                      <tr className="border-b border-[#F1F5F9] text-[#64748B] font-bold uppercase">
                         <th className="pb-3">สินค้า</th>
                         <th className="pb-3">หมวดหมู่หลัก / ย่อย</th>
                         <th className="pb-3">ขนาดที่มี</th>
@@ -2852,7 +2850,7 @@ export default function App() {
                         <th className="pb-3 text-right">จัดการ</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#F7F2F3]">
+                    <tbody className="divide-y divide-[#F1F5F9]">
                       {menuItems.map((item) => {
                         const inStock = isItemInStock(item);
                         const subCat = item.sub_category || item.subCategory;
@@ -2861,7 +2859,7 @@ export default function App() {
                         return (
                           <tr
                             key={item.id}
-                            className="hover:bg-[#FCFAFA] transition"
+                            className="hover:bg-[#F8FAFC] transition"
                           >
                             <td className="py-3.5 flex items-center gap-3">
                               <img
@@ -2870,15 +2868,15 @@ export default function App() {
                                 className="w-10 h-10 rounded-xl object-cover shrink-0 shadow-xs"
                               />
                               <div>
-                                <p className="font-extrabold text-[#1F1716]">
+                                <p className="font-extrabold text-[#0F172A]">
                                   {item.name}
                                 </p>
                               </div>
                             </td>
-                            <td className="py-3.5 text-[#736366]">
-                              <span className="capitalize font-bold text-[#1F1716]">{item.category}</span>
+                            <td className="py-3.5 text-[#64748B]">
+                              <span className="capitalize font-bold text-[#0F172A]">{item.category}</span>
                               {subCat && subCat !== "all" && (
-                                <span className="text-[10px] bg-[#F7F2F3] text-[#800020] px-2 py-0.5 rounded-md ml-1.5 font-bold uppercase">
+                                <span className="text-[10px] bg-[#FEF3C7] text-[#B45309] px-2 py-0.5 rounded-md ml-1.5 font-bold uppercase">
                                   {subCat}
                                 </span>
                               )}
@@ -2887,40 +2885,40 @@ export default function App() {
                               {hasSizes ? (
                                 <div className="flex flex-wrap gap-1">
                                   {item.sizes.map((s, idx) => (
-                                    <span key={idx} className="text-[10px] bg-[#F7F2F3] border border-[#800020]/20 text-[#800020] font-black px-2 py-0.5 rounded-md">
+                                    <span key={idx} className="text-[10px] bg-[#FEF3C7] border border-[#E69A09]/20 text-[#B45309] font-black px-2 py-0.5 rounded-md">
                                       {s.name} (฿{s.price})
                                     </span>
                                   ))}
                                 </div>
                               ) : (
-                                <span className="text-[#A8989B] italic text-[11px]">ขนาดเดียว</span>
+                                <span className="text-[#94A3B8] italic text-[11px]">ขนาดเดียว</span>
                               )}
                             </td>
                             <td className="py-3.5">
                               {inStock ? (
-                                <span className="text-[11px] text-[#800020] bg-[#F7F2F3] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#800020]/20">
+                                <span className="text-[11px] text-[#059669] bg-[#D1FAE5] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#10B981]/20">
                                   <CheckCircle2 size={12} /> พร้อมขาย
                                 </span>
                               ) : (
-                                <span className="text-[11px] text-[#D32F2F] bg-[#FDF2F2] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#F8D7D7]">
+                                <span className="text-[11px] text-[#EF4444] bg-[#FEF2F2] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#FCA5A5]">
                                   <XCircle size={12} />{" "}
                                   {!(item.in_stock ?? item.inStock) ? "ปิดขาย" : "วัตถุดิบหมด"}
                                 </span>
                               )}
                             </td>
-                            <td className="py-3.5 font-black text-[#800020]">
+                            <td className="py-3.5 font-black text-[#E69A09]">
                               {hasSizes ? `฿${item.sizes[0].price}+` : `฿${Number(item.price).toFixed(2)}`}
                             </td>
                             <td className="py-3.5 text-right space-x-2">
                               <button
                                 onClick={() => handleEditClick(item)}
-                                className="p-2 text-[#736366] hover:text-[#800020] hover:bg-[#F7F2F3] rounded-xl transition cursor-pointer"
+                                className="p-2 text-[#64748B] hover:text-[#E69A09] hover:bg-[#FEF3C7] rounded-xl transition cursor-pointer"
                               >
                                 <Edit3 size={16} />
                               </button>
                               <button
                                 onClick={() => handleDeleteItem(item.id)}
-                                className="p-2 text-[#736366] hover:text-[#D32F2F] hover:bg-[#FDF2F2] rounded-xl transition cursor-pointer"
+                                className="p-2 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl transition cursor-pointer"
                               >
                                 <Trash2 size={16} />
                               </button>
@@ -2937,8 +2935,8 @@ export default function App() {
 
           {adminSubTab === "inventory" && (
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs h-fit space-y-4">
-                <h2 className="text-base font-black text-[#1F1716]">
+              <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs h-fit space-y-4">
+                <h2 className="text-base font-black text-[#0F172A]">
                   เพิ่มวัตถุดิบใหม่เข้าคลัง
                 </h2>
                 <form
@@ -2946,7 +2944,7 @@ export default function App() {
                   className="space-y-4 text-xs"
                 >
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       ชื่อวัตถุดิบ
                     </label>
                     <input
@@ -2957,12 +2955,12 @@ export default function App() {
                         setIngForm({ ...ingForm, name: e.target.value })
                       }
                       placeholder="เช่น เมล็ดกาแฟ, นมสด"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-semibold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-semibold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         จำนวนสต็อก
                       </label>
                       <input
@@ -2973,11 +2971,11 @@ export default function App() {
                           setIngForm({ ...ingForm, stock: e.target.value })
                         }
                         placeholder="2000"
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-black"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-black"
                       />
                     </div>
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         หน่วยนับ
                       </label>
                       <select
@@ -2985,7 +2983,7 @@ export default function App() {
                         onChange={(e) =>
                           setIngForm({ ...ingForm, unit: e.target.value })
                         }
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold"
                       >
                         <option value="กรัม">กรัม (g)</option>
                         <option value="กิโลกรัม">กิโลกรัม (kg)</option>
@@ -2997,7 +2995,7 @@ export default function App() {
                     </div>
                   </div>
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       จุดเตือนสั่งซื้อเพิ่ม (Min Stock)
                     </label>
                     <input
@@ -3007,20 +3005,20 @@ export default function App() {
                         setIngForm({ ...ingForm, minStock: e.target.value })
                       }
                       placeholder="500"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-[#800020] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
+                    className="w-full bg-[#E69A09] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
                   >
                     + เพิ่มวัตถุดิบ
                   </button>
                 </form>
               </div>
 
-              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-                <h2 className="text-base font-black text-[#1F1716] mb-5">
+              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+                <h2 className="text-base font-black text-[#0F172A] mb-5">
                   คลังวัตถุดิบจริงทั้งหมด ({ingredients.length} รายการ)
                 </h2>
                 <div className="space-y-3">
@@ -3030,22 +3028,22 @@ export default function App() {
                     return (
                       <div
                         key={ing.id}
-                        className={`p-4 rounded-2xl border ${isLow ? "bg-[#FDF2F2] border-[#F8D7D7]" : "bg-[#FCFAFA] border-[#F7F2F3]"} flex justify-between items-center transition`}
+                        className={`p-4 rounded-2xl border ${isLow ? "bg-[#FEF2F2] border-[#FCA5A5]" : "bg-[#F8FAFC] border-[#F1F5F9]"} flex justify-between items-center transition`}
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-xs text-[#1F1716]">
+                            <span className="font-extrabold text-xs text-[#0F172A]">
                               {ing.name}
                             </span>
                             {isLow && (
-                              <span className="text-[10px] bg-[#D32F2F] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-xs">
+                              <span className="text-[10px] bg-[#EF4444] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-xs">
                                 <AlertTriangle size={10} /> วัตถุดิบใกล้หมด
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[#736366] font-medium mt-1">
+                          <p className="text-xs text-[#64748B] font-medium mt-1">
                             คงเหลือ:{" "}
-                            <span className="font-black text-[#800020]">
+                            <span className="font-black text-[#E69A09]">
                               {ing.stock}
                             </span>{" "}
                             {ing.unit} (ขั้นต่ำ: {minStock} {ing.unit})
@@ -3054,13 +3052,13 @@ export default function App() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleAddIngredientStock(ing.id, ing.stock, ing.name, ing.unit)}
-                            className="bg-[#800020] hover:bg-[#5B0015] text-white px-3.5 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition"
+                            className="bg-[#E69A09] hover:bg-[#D97706] text-white px-3.5 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition"
                           >
                             + เติมสต็อก
                           </button>
                           <button
                             onClick={() => handleDeleteIngredient(ing.id)}
-                            className="p-2 text-[#D32F2F] hover:bg-[#FDF2F2] rounded-xl cursor-pointer transition"
+                            className="p-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl cursor-pointer transition"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -3075,8 +3073,8 @@ export default function App() {
 
           {adminSubTab === "promotions" && (
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs h-fit space-y-4">
-                <h2 className="text-base font-black text-[#1F1716]">
+              <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs h-fit space-y-4">
+                <h2 className="text-base font-black text-[#0F172A]">
                   สร้างโปรโมชั่นใหม่
                 </h2>
                 <form
@@ -3084,7 +3082,7 @@ export default function App() {
                   className="space-y-4 text-xs"
                 >
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       โค้ดส่วนลด (Promotion Code)
                     </label>
                     <input
@@ -3095,11 +3093,11 @@ export default function App() {
                         setPromoForm({ ...promoForm, code: e.target.value })
                       }
                       placeholder="เช่น DISCOUNT10"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-black uppercase tracking-wider"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-black uppercase tracking-wider"
                     />
                   </div>
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       ชื่อโปรโมชั่น
                     </label>
                     <input
@@ -3110,12 +3108,12 @@ export default function App() {
                         setPromoForm({ ...promoForm, name: e.target.value })
                       }
                       placeholder="เช่น ลด 10% เมนูวันแม่"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-semibold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-semibold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         ประเภทส่วนลด
                       </label>
                       <select
@@ -3123,14 +3121,14 @@ export default function App() {
                         onChange={(e) =>
                           setPromoForm({ ...promoForm, type: e.target.value })
                         }
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold"
                       >
                         <option value="percent">เปอร์เซ็นต์ (%)</option>
                         <option value="fixed">จำนวนเงินคงที่ (บาท)</option>
                       </select>
                     </div>
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         มูลค่าส่วนลด
                       </label>
                       <input
@@ -3141,12 +3139,12 @@ export default function App() {
                           setPromoForm({ ...promoForm, value: e.target.value })
                         }
                         placeholder={promoForm.type === "percent" ? "10" : "20"}
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-black"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-black"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       ยอดขั้นต่ำในการใช้ (บาท)
                     </label>
                     <input
@@ -3156,20 +3154,20 @@ export default function App() {
                         setPromoForm({ ...promoForm, minSpend: e.target.value })
                       }
                       placeholder="100"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-[#800020] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
+                    className="w-full bg-[#E69A09] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
                   >
                     + เพิ่มโปรโมชั่น
                   </button>
                 </form>
               </div>
 
-              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
-                <h2 className="text-base font-black text-[#1F1716] mb-5">
+              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
+                <h2 className="text-base font-black text-[#0F172A] mb-5">
                   รายการโปรโมชั่นทั้งหมด ({promotions.length} รายการ)
                 </h2>
                 <div className="space-y-3">
@@ -3178,20 +3176,20 @@ export default function App() {
                     return (
                       <div
                         key={p.id}
-                        className="p-4 bg-[#FCFAFA] border border-[#F7F2F3] rounded-2xl flex justify-between items-center"
+                        className="p-4 bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl flex justify-between items-center"
                       >
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-black text-xs bg-[#800020] text-white px-3 py-0.5 rounded-lg tracking-wider">
+                            <span className="font-black text-xs bg-[#E69A09] text-white px-3 py-0.5 rounded-lg tracking-wider">
                               {p.code}
                             </span>
-                            <span className="font-bold text-xs text-[#1F1716]">
+                            <span className="font-bold text-xs text-[#0F172A]">
                               {p.name}
                             </span>
                           </div>
-                          <p className="text-xs text-[#736366] font-medium mt-1">
+                          <p className="text-xs text-[#64748B] font-medium mt-1">
                             ส่วนลด:{" "}
-                            <span className="font-black text-[#800020]">
+                            <span className="font-black text-[#E69A09]">
                               {p.type === "percent"
                                 ? `${p.value}%`
                                 : `฿${p.value}`}
@@ -3204,15 +3202,15 @@ export default function App() {
                             onClick={() => togglePromotionStatus(p.id, p.active)}
                             className={`px-3 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition ${
                               p.active
-                                ? "bg-[#EAF4ED] text-[#2E6F40]"
-                                : "bg-[#FDF2F2] text-[#D32F2F]"
+                                ? "bg-[#D1FAE5] text-[#059669]"
+                                : "bg-[#FEF2F2] text-[#EF4444]"
                             }`}
                           >
                             {p.active ? "เปิดใช้งานอยู่" : "ปิดใช้งาน"}
                           </button>
                           <button
                             onClick={() => handleDeletePromotion(p.id)}
-                            className="p-2 text-[#D32F2F] hover:bg-[#FDF2F2] rounded-xl cursor-pointer"
+                            className="p-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl cursor-pointer"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -3227,8 +3225,8 @@ export default function App() {
 
           {adminSubTab === "expenses" && (
             <div className="grid grid-cols-3 gap-8">
-              <div className="bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs h-fit space-y-4">
-                <h2 className="text-base font-black text-[#1F1716]">
+              <div className="bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs h-fit space-y-4">
+                <h2 className="text-base font-black text-[#0F172A]">
                   บันทึกรายจ่ายใหม่
                 </h2>
                 <form
@@ -3236,7 +3234,7 @@ export default function App() {
                   className="space-y-4 text-xs"
                 >
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       รายการรายจ่าย/ซื้อของ
                     </label>
                     <input
@@ -3250,12 +3248,12 @@ export default function App() {
                         })
                       }
                       placeholder="เช่น ซื้อแก้วกาแฟ 1,000 ใบ"
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-semibold"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-semibold"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         หมวดหมู่รายจ่าย
                       </label>
                       <select
@@ -3266,7 +3264,7 @@ export default function App() {
                             category: e.target.value,
                           })
                         }
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold"
                       >
                         <option value="raw_material">
                           วัตถุดิบ (Raw Material)
@@ -3277,7 +3275,7 @@ export default function App() {
                       </select>
                     </div>
                     <div>
-                      <label className="font-extrabold text-[#4D3F42] block mb-1">
+                      <label className="font-extrabold text-[#334155] block mb-1">
                         จำนวนเงิน (บาท)
                       </label>
                       <input
@@ -3291,12 +3289,12 @@ export default function App() {
                           })
                         }
                         placeholder="1500"
-                        className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-black"
+                        className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-black"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="font-extrabold text-[#4D3F42] block mb-1">
+                    <label className="font-extrabold text-[#334155] block mb-1">
                       วันที่บันทึก
                     </label>
                     <input
@@ -3309,24 +3307,24 @@ export default function App() {
                           date: e.target.value,
                         })
                       }
-                      className="w-full p-3 bg-[#FCFAFA] border border-[#E8DFE1] rounded-xl outline-none font-bold text-[#1F1716]"
+                      className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl outline-none font-bold text-[#0F172A]"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-[#800020] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
+                    className="w-full bg-[#E69A09] text-white font-black py-3.5 rounded-2xl shadow-md text-xs cursor-pointer uppercase tracking-wider"
                   >
                     + บันทึกรายจ่าย
                   </button>
                 </form>
               </div>
 
-              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E8DFE1] shadow-xs">
+              <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
                 <div className="flex justify-between items-center mb-5">
-                  <h2 className="text-base font-black text-[#1F1716]">
+                  <h2 className="text-base font-black text-[#0F172A]">
                     รายการบันทึกรายจ่ายทั้งหมด ({expenses.length} รายการ)
                   </h2>
-                  <span className="text-xs font-black text-[#D32F2F] bg-[#FDF2F2] px-3.5 py-1 rounded-full border border-[#F8D7D7]">
+                  <span className="text-xs font-black text-[#EF4444] bg-[#FEF2F2] px-3.5 py-1 rounded-full border border-[#FCA5A5]">
                     รวมสะสม: ฿{totalExpensesAll.toFixed(2)}
                   </span>
                 </div>
@@ -3335,14 +3333,14 @@ export default function App() {
                   {expenses.map((e) => (
                     <div
                       key={e.id}
-                      className="p-4 bg-[#FCFAFA] border border-[#F7F2F3] rounded-2xl flex justify-between items-center"
+                      className="p-4 bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl flex justify-between items-center"
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-[#1F1716]">
+                          <span className="font-bold text-xs text-[#0F172A]">
                             {e.title}
                           </span>
-                          <span className="text-[10px] bg-[#F7F2F3] text-[#800020] px-2.5 py-0.5 rounded-full font-extrabold">
+                          <span className="text-[10px] bg-[#FEF3C7] text-[#B45309] px-2.5 py-0.5 rounded-full font-extrabold">
                             {e.category === "raw_material"
                               ? "วัตถุดิบ"
                               : e.category === "equipment"
@@ -3352,17 +3350,17 @@ export default function App() {
                               : "อื่นๆ"}
                           </span>
                         </div>
-                        <p className="text-xs text-[#736366] font-medium mt-1 flex items-center gap-1">
+                        <p className="text-xs text-[#64748B] font-medium mt-1 flex items-center gap-1">
                           <Calendar size={13} /> {e.date}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-black text-sm text-[#D32F2F]">
+                        <span className="font-black text-sm text-[#EF4444]">
                           -฿{Number(e.amount).toFixed(2)}
                         </span>
                         <button
                           onClick={() => handleDeleteExpense(e.id)}
-                          className="p-2 text-[#D32F2F] hover:bg-[#FDF2F2] rounded-xl cursor-pointer"
+                          className="p-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl cursor-pointer"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -3378,22 +3376,22 @@ export default function App() {
 
       {/* Checkout Modal */}
       {isCheckoutOpen && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-7 border border-[#E8DFE1] animate-fadeIn">
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-7 border border-[#E2E8F0] animate-fadeIn">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-black text-[#1F1716] tracking-tight">
+              <h3 className="text-lg font-black text-[#0F172A] tracking-tight">
                 ชำระเงิน (คิว {String(orderQueueCount).padStart(2, "0")})
               </h3>
               <button
                 onClick={() => setIsCheckoutOpen(false)}
-                className="cursor-pointer text-[#A8989B] hover:text-[#1F1716] p-1 rounded-full hover:bg-[#F7F2F3] transition"
+                className="cursor-pointer text-[#94A3B8] hover:text-[#0F172A] p-1 rounded-full hover:bg-[#F1F5F9] transition"
               >
                 <X size={20} />
               </button>
             </div>
 
             <div className="mb-5">
-              <label className="text-xs font-extrabold text-[#736366] block mb-2">
+              <label className="text-xs font-extrabold text-[#64748B] block mb-2">
                 ประเภทการสั่งซื้อ
               </label>
               <div className="grid grid-cols-3 gap-2.5">
@@ -3401,7 +3399,7 @@ export default function App() {
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`py-2.5 rounded-2xl text-xs font-black border transition cursor-pointer ${orderType === type ? "bg-[#800020] text-white border-[#800020] shadow-sm" : "bg-[#FCFAFA] text-[#736366] border-[#E8DFE1]"}`}
+                    className={`py-2.5 rounded-2xl text-xs font-black border transition cursor-pointer ${orderType === type ? "bg-[#E69A09] text-white border-[#E69A09] shadow-sm" : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0]"}`}
                   >
                     {type === "Dine-in"
                       ? "ทานที่ร้าน"
@@ -3413,8 +3411,8 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mb-5 bg-[#FCFAFA] p-3.5 rounded-2xl border border-[#F7F2F3]">
-              <label className="text-xs font-extrabold text-[#736366] block mb-1.5">
+            <div className="mb-5 bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#F1F5F9]">
+              <label className="text-xs font-extrabold text-[#64748B] block mb-1.5">
                 ส่วนลดกำหนดเองเพิ่มเติม (บาท)
               </label>
               <input
@@ -3422,39 +3420,39 @@ export default function App() {
                 value={customDiscount}
                 onChange={(e) => setCustomDiscount(e.target.value)}
                 placeholder="0"
-                className="w-full p-2.5 bg-white border border-[#E8DFE1] rounded-xl text-xs font-black text-[#1F1716] outline-none focus:ring-2 focus:ring-[#800020]"
+                className="w-full p-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-black text-[#0F172A] outline-none focus:ring-2 focus:ring-[#E69A09]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-5">
               <button
                 onClick={() => setPaymentMethod("qr")}
-                className={`p-4 rounded-2xl border flex flex-col items-center gap-2 cursor-pointer transition font-black text-xs ${paymentMethod === "qr" ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-sm" : "border-[#E8DFE1] text-[#736366]"}`}
+                className={`p-4 rounded-2xl border flex flex-col items-center gap-2 cursor-pointer transition font-black text-xs ${paymentMethod === "qr" ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-sm" : "border-[#E2E8F0] text-[#64748B]"}`}
               >
-                <QrCode size={20} className="text-[#800020]" /> สแกน QR Code
+                <QrCode size={20} className="text-[#E69A09]" /> สแกน QR Code
               </button>
               <button
                 onClick={() => setPaymentMethod("cash")}
-                className={`p-4 rounded-2xl border flex flex-col items-center gap-2 cursor-pointer transition font-black text-xs ${paymentMethod === "cash" ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-sm" : "border-[#E8DFE1] text-[#736366]"}`}
+                className={`p-4 rounded-2xl border flex flex-col items-center gap-2 cursor-pointer transition font-black text-xs ${paymentMethod === "cash" ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-sm" : "border-[#E2E8F0] text-[#64748B]"}`}
               >
-                <DollarSign size={20} className="text-[#800020]" /> เงินสด
+                <DollarSign size={20} className="text-[#E69A09]" /> เงินสด
               </button>
             </div>
 
             {paymentMethod === "qr" ? (
-              <div className="text-center p-6 bg-[#FCFAFA] rounded-2xl border border-[#F7F2F3] mb-6">
+              <div className="text-center p-6 bg-[#F8FAFC] rounded-2xl border border-[#F1F5F9] mb-6">
                 <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=COE_CAFE_18"
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=SWEET_GEAR_CAFE"
                   alt="QR Code"
-                  className="mx-auto mb-3 rounded-2xl border border-[#E8DFE1] p-2.5 bg-white shadow-xs"
+                  className="mx-auto mb-3 rounded-2xl border border-[#E2E8F0] p-2.5 bg-white shadow-xs"
                 />
-                <p className="text-xs font-black text-[#736366]">
+                <p className="text-xs font-black text-[#64748B]">
                   สแกนชำระยอดสุทธิ ฿{total.toFixed(2)}
                 </p>
               </div>
             ) : (
               <div className="mb-6 space-y-3">
-                <label className="text-xs font-extrabold text-[#4D3F42]">
+                <label className="text-xs font-extrabold text-[#334155]">
                   รับเงินสดมา (บาท)
                 </label>
                 <input
@@ -3462,7 +3460,7 @@ export default function App() {
                   placeholder="0.00"
                   value={cashReceived}
                   onChange={(e) => setCashReceived(e.target.value)}
-                  className="w-full p-3.5 text-xl font-black bg-[#FCFAFA] border border-[#E8DFE1] rounded-2xl text-center focus:ring-2 focus:ring-[#800020] outline-none text-[#1F1716]"
+                  className="w-full p-3.5 text-xl font-black bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-center focus:ring-2 focus:ring-[#E69A09] outline-none text-[#0F172A]"
                 />
 
                 <div className="flex gap-2">
@@ -3470,7 +3468,7 @@ export default function App() {
                     <button
                       key={amt}
                       onClick={() => setCashReceived(String(amt))}
-                      className="flex-1 bg-[#F7F2F3] hover:bg-[#F3E9EB] text-[#800020] font-black py-2 rounded-xl text-xs cursor-pointer transition"
+                      className="flex-1 bg-[#FEF3C7] hover:bg-[#FDE68A] text-[#B45309] font-black py-2 rounded-xl text-xs cursor-pointer transition"
                     >
                       ฿{amt}
                     </button>
@@ -3478,7 +3476,7 @@ export default function App() {
                 </div>
 
                 {Number(cashReceived) >= total && (
-                  <p className="text-[#2E6F40] text-xs font-black text-center pt-1">
+                  <p className="text-[#10B981] text-xs font-black text-center pt-1">
                     เงินทอน: ฿{(Number(cashReceived) - total).toFixed(2)}
                   </p>
                 )}
@@ -3490,7 +3488,7 @@ export default function App() {
                 paymentMethod === "cash" && Number(cashReceived) < total
               }
               onClick={handleProcessPayment}
-              className="w-full bg-[#800020] hover:bg-[#5B0015] disabled:bg-[#E8DFE1] disabled:text-[#A8989B] text-white font-black py-4 rounded-2xl shadow-lg cursor-pointer text-xs transition uppercase tracking-wider"
+              className="w-full bg-[#E69A09] hover:bg-[#D97706] disabled:bg-[#E2E8F0] disabled:text-[#94A3B8] text-white font-black py-4 rounded-2xl shadow-lg cursor-pointer text-xs transition uppercase tracking-wider"
             >
               ยืนยันการรับชำระเงิน (฿{total.toFixed(2)})
             </button>
@@ -3500,40 +3498,40 @@ export default function App() {
 
       {/* Shift Close Summary Modal */}
       {isShiftCloseOpen && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl border border-[#E8DFE1] animate-fadeIn">
-            <div className="text-center mb-6 border-b border-[#F7F2F3] pb-4">
-              <Receipt size={32} className="mx-auto text-[#800020] mb-2" />
-              <h3 className="text-lg font-black text-[#1F1716]">
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl border border-[#E2E8F0] animate-fadeIn">
+            <div className="text-center mb-6 border-b border-[#F1F5F9] pb-4">
+              <Receipt size={32} className="mx-auto text-[#E69A09] mb-2" />
+              <h3 className="text-lg font-black text-[#0F172A]">
                 สรุปยอดปิดกะประจำวัน
               </h3>
-              <p className="text-xs font-bold text-[#736366] mt-0.5">
+              <p className="text-xs font-bold text-[#64748B] mt-0.5">
                 {new Date().toLocaleDateString("th-TH")}
               </p>
             </div>
 
             <div className="space-y-3.5 text-xs mb-6">
               <div className="flex justify-between">
-                <span className="font-semibold text-[#736366]">จำนวนออเดอร์ทั้งหมด:</span>{" "}
-                <span className="font-extrabold text-[#1F1716]">{totalOrdersCountAll} ออเดอร์</span>
+                <span className="font-semibold text-[#64748B]">จำนวนออเดอร์ทั้งหมด:</span>{" "}
+                <span className="font-extrabold text-[#0F172A]">{totalOrdersCountAll} ออเดอร์</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-[#736366]">จำนวนสินค้าที่ขายได้:</span>{" "}
-                <span className="font-extrabold text-[#1F1716]">{totalItemsSoldAll} ชิ้น</span>
+                <span className="font-semibold text-[#64748B]">จำนวนสินค้าที่ขายได้:</span>{" "}
+                <span className="font-extrabold text-[#0F172A]">{totalItemsSoldAll} ชิ้น</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-[#736366]">รายรับรวม:</span>{" "}
-                <span className="font-black text-[#800020]">
+                <span className="font-semibold text-[#64748B]">รายรับรวม:</span>{" "}
+                <span className="font-black text-[#E69A09]">
                   ฿{totalRevenueAll.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-[#736366]">รายจ่ายรวม:</span>{" "}
-                <span className="font-black text-[#D32F2F]">
+                <span className="font-semibold text-[#64748B]">รายจ่ายรวม:</span>{" "}
+                <span className="font-black text-[#EF4444]">
                   ฿{totalExpensesAll.toFixed(2)}
                 </span>
               </div>
-              <div className="border-t border-[#F7F2F3] pt-3 flex justify-between font-black text-sm text-[#2E6F40]">
+              <div className="border-t border-[#F1F5F9] pt-3 flex justify-between font-black text-sm text-[#10B981]">
                 <span>กำไรสุทธิคงเหลือ:</span>{" "}
                 <span>฿{(totalRevenueAll - totalExpensesAll).toFixed(2)}</span>
               </div>
@@ -3541,7 +3539,7 @@ export default function App() {
 
             <button
               onClick={() => setIsShiftCloseOpen(false)}
-              className="w-full bg-[#800020] text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-md cursor-pointer"
+              className="w-full bg-[#E69A09] text-white font-black py-3.5 rounded-2xl text-xs uppercase tracking-wider shadow-md cursor-pointer"
             >
               ปิดหน้านี้
             </button>
@@ -3549,29 +3547,29 @@ export default function App() {
         </div>
       )}
 
-      {/* Customization Modal (เลือกขนาดแก้ว & ออปชัน) */}
+      {/* Customization Modal */}
       {selectedItemForCustom && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-[#E8DFE1] animate-fadeIn">
-            <div className="p-6 bg-[#2B050E] text-white flex justify-between items-center">
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-[#E2E8F0] animate-fadeIn">
+            <div className="p-6 bg-[#0F172A] text-white flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <img
                   src={selectedItemForCustom.image}
                   alt=""
-                  className="w-14 h-14 rounded-2xl object-cover border border-[#4D0D1D] shadow-md"
+                  className="w-14 h-14 rounded-2xl object-cover border border-[#334155] shadow-md"
                 />
                 <div>
-                  <h3 className="font-black text-base text-[#F3C6CE]">
+                  <h3 className="font-black text-base text-[#F8FAFC]">
                     {selectedItemForCustom.name}
                   </h3>
-                  <p className="text-xs font-bold text-[#E07A8B] mt-0.5">
+                  <p className="text-xs font-bold text-[#FBBF24] mt-0.5">
                     {selectedSize ? `ขนาด ${selectedSize.name} • ฿${selectedSize.price}` : `เริ่มต้น ฿${selectedItemForCustom.price}`}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedItemForCustom(null)}
-                className="p-2 hover:bg-[#3B0815] rounded-full cursor-pointer text-[#C2A3A9] hover:text-white transition"
+                className="p-2 hover:bg-[#1E293B] rounded-full cursor-pointer text-[#94A3B8] hover:text-white transition"
               >
                 <X size={20} />
               </button>
@@ -3581,7 +3579,7 @@ export default function App() {
               {/* เลือกขนาดแก้ว (Size Selection) */}
               {selectedItemForCustom.sizes && selectedItemForCustom.sizes.length > 0 && (
                 <div>
-                  <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
+                  <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
                     ขนาดแก้ว (Size)
                   </label>
                   <div className="grid grid-cols-2 gap-2.5">
@@ -3596,17 +3594,17 @@ export default function App() {
                           onClick={() => setSelectedSize(sz)}
                           className={`p-3.5 rounded-2xl border flex justify-between items-center transition font-extrabold ${
                             !sizeInStock
-                              ? "opacity-40 border-[#E8DFE1] bg-[#FCFAFA] cursor-not-allowed"
+                              ? "opacity-40 border-[#E2E8F0] bg-[#F8FAFC] cursor-not-allowed"
                               : isSelected
-                              ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-xs cursor-pointer"
-                              : "border-[#E8DFE1] text-[#736366] hover:bg-[#FCFAFA] cursor-pointer"
+                              ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-xs cursor-pointer"
+                              : "border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] cursor-pointer"
                           }`}
                         >
                           <span className="flex items-center gap-1.5">
                             {sz.name}
-                            {!sizeInStock && <span className="text-[9px] text-[#D32F2F] font-bold">(หมด)</span>}
+                            {!sizeInStock && <span className="text-[9px] text-[#EF4444] font-bold">(หมด)</span>}
                           </span>
-                          <span className="text-[#800020] font-black">฿{sz.price}</span>
+                          <span className="text-[#E69A09] font-black">฿{sz.price}</span>
                         </button>
                       );
                     })}
@@ -3616,7 +3614,7 @@ export default function App() {
 
               {(selectedItemForCustom.sweetness_options || selectedItemForCustom.sweetnessOptions)?.length > 0 && (
                 <div>
-                  <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
+                  <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
                     ระดับความหวาน
                   </label>
                   <div className="grid grid-cols-3 gap-2.5">
@@ -3624,7 +3622,7 @@ export default function App() {
                       <button
                         key={sw}
                         onClick={() => setSweetness(sw)}
-                        className={`py-3 rounded-2xl border transition cursor-pointer font-black ${sweetness === sw ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-xs" : "border-[#E8DFE1] text-[#736366] hover:bg-[#FCFAFA]"}`}
+                        className={`py-3 rounded-2xl border transition cursor-pointer font-black ${sweetness === sw ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-xs" : "border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"}`}
                       >
                         {sw}
                       </button>
@@ -3635,7 +3633,7 @@ export default function App() {
 
               {(selectedItemForCustom.milk_options || selectedItemForCustom.milkOptions)?.length > 0 && (
                 <div>
-                  <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
+                  <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
                     ตัวเลือกนม (Milk)
                   </label>
                   <div className="space-y-2">
@@ -3643,10 +3641,10 @@ export default function App() {
                       <button
                         key={m.id}
                         onClick={() => setMilk(m)}
-                        className={`w-full p-3.5 rounded-2xl border flex justify-between transition cursor-pointer font-extrabold ${milk?.id === m.id ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-xs" : "border-[#E8DFE1] text-[#736366] hover:bg-[#FCFAFA]"}`}
+                        className={`w-full p-3.5 rounded-2xl border flex justify-between transition cursor-pointer font-extrabold ${milk?.id === m.id ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-xs" : "border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"}`}
                       >
                         <span>{m.label}</span>
-                        <span className="text-[#800020] font-black">+{m.price}฿</span>
+                        <span className="text-[#E69A09] font-black">+{m.price}฿</span>
                       </button>
                     ))}
                   </div>
@@ -3655,7 +3653,7 @@ export default function App() {
 
               {selectedItemForCustom.addons?.length > 0 && (
                 <div>
-                  <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5">
+                  <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
                     ท็อปปิ้ง / ตัวเลือกเพิ่มเติม
                   </label>
                   <div className="space-y-2">
@@ -3675,10 +3673,10 @@ export default function App() {
                               setSelectedAddons([...selectedAddons, addon]);
                             }
                           }}
-                          className={`w-full p-3.5 rounded-2xl border flex justify-between transition cursor-pointer font-extrabold ${isSelected ? "border-[#800020] bg-[#F7F2F3] text-[#1F1716] shadow-xs" : "border-[#E8DFE1] text-[#736366] hover:bg-[#FCFAFA]"}`}
+                          className={`w-full p-3.5 rounded-2xl border flex justify-between transition cursor-pointer font-extrabold ${isSelected ? "border-[#E69A09] bg-[#FEF3C7]/40 text-[#0F172A] shadow-xs" : "border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"}`}
                         >
                           <span>{addon.label}</span>
-                          <span className="text-[#800020] font-black">
+                          <span className="text-[#E69A09] font-black">
                             +{addon.price}฿
                           </span>
                         </button>
@@ -3689,8 +3687,8 @@ export default function App() {
               )}
 
               <div>
-                <label className="font-black text-[#736366] text-[11px] uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
-                  <FileText size={15} className="text-[#800020]" />{" "}
+                <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5 flex items-center gap-1.5">
+                  <FileText size={15} className="text-[#E69A09]" />{" "}
                   หมายเหตุพิเศษ (Note / Special Instructions)
                 </label>
                 <input
@@ -3698,30 +3696,30 @@ export default function App() {
                   value={itemNote}
                   onChange={(e) => setItemNote(e.target.value)}
                   placeholder="เช่น หวานน้อยมาก, แยกน้ำแข็ง, ขอแก้วซ้อน 2 ชั้น..."
-                  className="w-full p-3.5 bg-[#FCFAFA] border border-[#E8DFE1] rounded-2xl text-xs focus:ring-2 focus:ring-[#800020] focus:bg-white outline-none transition font-semibold"
+                  className="w-full p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-xs focus:ring-2 focus:ring-[#E69A09] focus:bg-white outline-none transition font-semibold"
                 />
               </div>
             </div>
 
-            <div className="p-5 border-t border-[#F7F2F3] flex gap-3 bg-[#FCFAFA]">
-              <div className="flex items-center gap-3 border border-[#E8DFE1] bg-white px-4 rounded-2xl shadow-xs">
+            <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#F8FAFC]">
+              <div className="flex items-center gap-3 border border-[#E2E8F0] bg-white px-4 rounded-2xl shadow-xs">
                 <button
                   onClick={() => setCustomQty((q) => Math.max(1, q - 1))}
-                  className="cursor-pointer text-[#736366] hover:text-[#1F1716] transition"
+                  className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition"
                 >
                   <Minus size={16} />
                 </button>
-                <span className="font-black text-[#1F1716]">{customQty}</span>
+                <span className="font-black text-[#0F172A]">{customQty}</span>
                 <button
                   onClick={() => setCustomQty((q) => q + 1)}
-                  className="cursor-pointer text-[#736366] hover:text-[#1F1716] transition"
+                  className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition"
                 >
                   <Plus size={16} />
                 </button>
               </div>
               <button
                 onClick={handleAddCustomizedToCart}
-                className="flex-1 bg-[#800020] hover:bg-[#5B0015] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
+                className="flex-1 bg-[#E69A09] hover:bg-[#D97706] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
               >
                 เพิ่มลงตะกร้า
               </button>
@@ -3732,40 +3730,40 @@ export default function App() {
 
       {/* Receipt Modal */}
       {activeReceipt && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl font-mono text-xs border border-[#E8DFE1] relative overflow-hidden animate-fadeIn">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#A31B38] via-[#800020] to-[#5B0015]"></div>
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl font-mono text-xs border border-[#E2E8F0] relative overflow-hidden animate-fadeIn">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#F59E0B] via-[#E69A09] to-[#B45309]"></div>
 
-            <div className="text-center border-b border-dashed border-[#800020]/30 pb-5 mb-5">
-              <h2 className="text-base font-black text-[#1F1716] tracking-widest">
-                COE_CAFE#18
+            <div className="text-center border-b border-dashed border-[#E69A09]/40 pb-5 mb-5">
+              <h2 className="text-base font-black text-[#0F172A] tracking-widest">
+                SWEET GEAR CAFE
               </h2>
-              <p className="text-[11px] text-[#736366] font-sans font-bold mt-1">
+              <p className="text-[11px] text-[#64748B] font-sans font-bold mt-1">
                 คิวคำสั่งซื้อ:{" "}
-                <span className="font-black text-[#800020] text-sm">
+                <span className="font-black text-[#E69A09] text-sm">
                   {activeReceipt.queueNo}
                 </span>
               </p>
-              <p className="text-[10px] text-[#A8989B] mt-1 font-sans">
+              <p className="text-[10px] text-[#94A3B8] mt-1 font-sans">
                 {activeReceipt.id} • {activeReceipt.date} {activeReceipt.time}
               </p>
             </div>
 
-            <div className="space-y-2.5 border-b border-dashed border-[#800020]/30 pb-5 mb-5">
+            <div className="space-y-2.5 border-b border-dashed border-[#E69A09]/40 pb-5 mb-5">
               {activeReceipt.items.map((item) => (
                 <div
                   key={item.cartId}
-                  className="flex justify-between text-[#1F1716]"
+                  className="flex justify-between text-[#0F172A]"
                 >
                   <div>
                     <p className="font-bold">
                       {item.name} x{item.qty}
                     </p>
-                    <p className="text-[10px] text-[#736366] font-sans">
+                    <p className="text-[10px] text-[#64748B] font-sans">
                       {item.optionsText}
                     </p>
                     {item.noteText && (
-                      <p className="text-[10px] text-[#800020] font-sans italic">
+                      <p className="text-[10px] text-[#E69A09] font-sans italic">
                         * {item.noteText}
                       </p>
                     )}
@@ -3777,30 +3775,30 @@ export default function App() {
               ))}
             </div>
 
-            <div className="space-y-1.5 border-b border-dashed border-[#800020]/30 pb-5 mb-5 text-[#736366]">
+            <div className="space-y-1.5 border-b border-dashed border-[#E69A09]/40 pb-5 mb-5 text-[#64748B]">
               <div className="flex justify-between">
                 <span>รวม:</span>{" "}
                 <span>฿{activeReceipt.subtotal.toFixed(2)}</span>
               </div>
               {activeReceipt.discount > 0 && (
-                <div className="flex justify-between text-[#D32F2F]">
+                <div className="flex justify-between text-[#EF4444]">
                   <span>ส่วนลด:</span>{" "}
                   <span>-฿{activeReceipt.discount.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between font-[#1F1716] font-black text-sm pt-1.5">
+              <div className="flex justify-between font-[#0F172A] font-black text-sm pt-1.5">
                 <span>ยอดรวมสุทธิ (รวม VAT):</span>{" "}
-                <span className="text-[#800020]">
+                <span className="text-[#E69A09]">
                   ฿{activeReceipt.total.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between text-[10px] text-[#A8989B] pt-0.5">
+              <div className="flex justify-between text-[10px] text-[#94A3B8] pt-0.5">
                 <span>(ภาษีมูลค่าเพิ่ม VAT 7%):</span>{" "}
                 <span>฿{activeReceipt.vat.toFixed(2)}</span>
               </div>
             </div>
 
-            <div className="space-y-1 text-[#736366] mb-6">
+            <div className="space-y-1 text-[#64748B] mb-6">
               <div className="flex justify-between">
                 <span>ประเภท:</span> <span>{activeReceipt.orderType}</span>
               </div>
@@ -3813,13 +3811,13 @@ export default function App() {
             <div className="flex gap-3 font-sans">
               <button
                 onClick={() => window.print()}
-                className="flex-1 bg-[#800020] hover:bg-[#5B0015] text-white font-black py-3.5 rounded-2xl flex justify-center items-center gap-2 cursor-pointer text-xs transition shadow-md uppercase tracking-wider"
+                className="flex-1 bg-[#E69A09] hover:bg-[#D97706] text-white font-black py-3.5 rounded-2xl flex justify-center items-center gap-2 cursor-pointer text-xs transition shadow-md uppercase tracking-wider"
               >
                 <Printer size={15} /> พิมพ์สลิป
               </button>
               <button
                 onClick={() => setActiveReceipt(null)}
-                className="px-5 border border-[#E8DFE1] rounded-2xl font-bold text-[#4D3F42] hover:bg-[#F7F2F3] cursor-pointer text-xs transition"
+                className="px-5 border border-[#E2E8F0] rounded-2xl font-bold text-[#334155] hover:bg-[#F1F5F9] cursor-pointer text-xs transition"
               >
                 ปิด
               </button>
@@ -3830,23 +3828,23 @@ export default function App() {
 
       {/* Shared Password PIN Modal */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-7 relative border border-[#E8DFE1] animate-fadeIn">
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-7 relative border border-[#E2E8F0] animate-fadeIn">
             <button
               onClick={() => setIsAuthModalOpen(false)}
-              className="absolute right-5 top-5 text-[#A8989B] hover:text-[#1F1716] p-1 rounded-full hover:bg-[#F7F2F3] transition"
+              className="absolute right-5 top-5 text-[#94A3B8] hover:text-[#0F172A] p-1 rounded-full hover:bg-[#F1F5F9] transition"
             >
               <X size={20} />
             </button>
 
             <div className="text-center mb-6">
-              <div className="w-14 h-14 bg-[#F7F2F3] text-[#800020] rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner border border-[#800020]/20">
+              <div className="w-14 h-14 bg-[#FEF3C7] text-[#B45309] rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner border border-[#E69A09]/20">
                 <KeyRound size={24} />
               </div>
-              <h3 className="text-lg font-black text-[#1F1716]">
+              <h3 className="text-lg font-black text-[#0F172A]">
                 ยืนยันรหัสผ่านเพื่อเข้าใช้งาน
               </h3>
-              <p className="text-xs font-semibold text-[#736366] mt-1">
+              <p className="text-xs font-semibold text-[#64748B] mt-1">
                 กรอกรหัส PIN 4 หลัก (เพื่อเข้า Dashboard & Admin)
               </p>
             </div>
@@ -3860,10 +3858,10 @@ export default function App() {
                   value={pinInput}
                   onChange={(e) => setPinInput(e.target.value)}
                   placeholder="• • • •"
-                  className="w-full text-center text-3xl tracking-[1em] py-4 bg-[#FCFAFA] border border-[#E8DFE1] rounded-2xl focus:ring-2 focus:ring-[#800020] outline-none font-black text-[#1F1716]"
+                  className="w-full text-center text-3xl tracking-[1em] py-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl focus:ring-2 focus:ring-[#E69A09] outline-none font-black text-[#0F172A]"
                 />
                 {pinError && (
-                  <p className="text-[#D32F2F] text-xs font-bold text-center mt-2.5">
+                  <p className="text-[#EF4444] text-xs font-bold text-center mt-2.5">
                     รหัสผ่านไม่ถูกต้อง!
                   </p>
                 )}
@@ -3871,7 +3869,7 @@ export default function App() {
 
               <button
                 type="submit"
-                className="w-full bg-[#800020] hover:bg-[#5B0015] text-white font-black py-4 rounded-2xl shadow-md transition cursor-pointer text-xs uppercase tracking-wider"
+                className="w-full bg-[#E69A09] hover:bg-[#D97706] text-white font-black py-4 rounded-2xl shadow-md transition cursor-pointer text-xs uppercase tracking-wider"
               >
                 ปลดล็อกเพื่อเข้าใช้งาน
               </button>
@@ -3882,23 +3880,23 @@ export default function App() {
 
       {/* Logout Confirm Modal */}
       {isLogoutModalOpen && (
-        <div className="fixed inset-0 bg-[#1A0006]/65 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-7 relative border border-[#E8DFE1] animate-fadeIn">
+        <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-7 relative border border-[#E2E8F0] animate-fadeIn">
             <button
               onClick={() => setIsLogoutModalOpen(false)}
-              className="absolute right-5 top-5 text-[#A8989B] hover:text-[#1F1716] p-1 rounded-full hover:bg-[#F7F2F3] transition"
+              className="absolute right-5 top-5 text-[#94A3B8] hover:text-[#0F172A] p-1 rounded-full hover:bg-[#F1F5F9] transition"
             >
               <X size={20} />
             </button>
 
             <div className="text-center mb-6">
-              <div className="w-14 h-14 bg-[#FDF2F2] text-[#D32F2F] rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
+              <div className="w-14 h-14 bg-[#FEF2F2] text-[#EF4444] rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
                 <LogoutIcon size={24} />
               </div>
-              <h3 className="text-lg font-black text-[#1F1716]">
+              <h3 className="text-lg font-black text-[#0F172A]">
                 ยืนยันการออกจากระบบ
               </h3>
-              <p className="text-xs font-semibold text-[#736366] mt-1">
+              <p className="text-xs font-semibold text-[#64748B] mt-1">
                 การออกจากระบบจะทำการล็อกส่วน Dashboard และ Admin
               </p>
             </div>
@@ -3907,14 +3905,14 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setIsLogoutModalOpen(false)}
-                className="flex-1 border border-[#E8DFE1] rounded-2xl font-black text-[#4D3F42] hover:bg-[#F7F2F3] py-3.5 text-xs transition cursor-pointer"
+                className="flex-1 border border-[#E2E8F0] rounded-2xl font-black text-[#334155] hover:bg-[#F1F5F9] py-3.5 text-xs transition cursor-pointer"
               >
                 ยกเลิก
               </button>
               <button
                 type="button"
                 onClick={handleLogoutConfirm}
-                className="flex-1 bg-[#D32F2F] hover:bg-[#B71C1C] text-white font-black py-3.5 rounded-2xl shadow-md transition cursor-pointer text-xs uppercase tracking-wider"
+                className="flex-1 bg-[#EF4444] hover:bg-[#DC2626] text-white font-black py-3.5 rounded-2xl shadow-md transition cursor-pointer text-xs uppercase tracking-wider"
               >
                 ยืนยันล็อกเอาต์
               </button>
