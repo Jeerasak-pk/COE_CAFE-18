@@ -156,21 +156,48 @@ export default function App() {
   };
 
   useEffect(() => {
-    fetchAllData();
+  // ดึงข้อมูลครั้งแรกเมื่อเปิดหน้าเว็บ
+  fetchAllData();
 
-    const channel = supabase
-      .channel("pos-realtime-channel")
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () => fetchAllData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "ingredients" }, () => fetchAllData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, () => fetchAllData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "promotions" }, () => fetchAllData())
-      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" }, () => fetchAllData())
-      .subscribe();
+  // สร้าง Realtime Subscription Channel
+  const channel = supabase
+    .channel("pos-realtime-changes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "menu_items" },
+      (payload) => {
+        console.log("Menu Items updated in realtime!", payload);
+        fetchAllData(); // เรียกดึงข้อมูลใหม่ทันทีที่มีการเพิ่ม/แก้/ลบเมนู
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "ingredients" },
+      () => fetchAllData()
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "orders" },
+      () => fetchAllData()
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "promotions" },
+      () => fetchAllData()
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "expenses" },
+      () => fetchAllData()
+    )
+    .subscribe((status) => {
+      console.log("Supabase Realtime Status:", status);
+    });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
   const [adminSubTab, setAdminSubTab] = useState("menu");
 
