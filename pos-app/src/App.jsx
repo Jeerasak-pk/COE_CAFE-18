@@ -4187,22 +4187,43 @@ export default function App() {
             </div>
 
             <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
-              <div className="flex items-center gap-3 border border-[#E2E8F0] bg-white px-4 rounded-2xl shadow-xs">
-                <button onClick={() => setCustomQty((q) => Math.max(1, q - 1))} className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition">
-                  <Minus size={16} />
-                </button>
-                <span className="font-black text-[#0F172A]">{customQty}</span>
-                <button onClick={() => setCustomQty((q) => q + 1)} className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition">
-                  <Plus size={16} />
-                </button>
-              </div>
-              <button
-                onClick={handleAddCustomizedToCart}
-                className="flex-1 bg-[#800020] hover:bg-[#5C0017] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
-              >
-                {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
-              </button>
-            </div>
+  {/* ปรับแก้ตรงนี้: เปลี่ยนจากตัวเลขธรรมดาให้เป็นช่อง input type="number" ให้พิมพ์ได้ */}
+  <div className="flex items-center gap-2 border border-[#E2E8F0] bg-white px-3 py-1.5 rounded-2xl shadow-xs">
+    <button 
+      onClick={() => setCustomQty((q) => Math.max(1, q - 1))} 
+      className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition p-1"
+      type="button"
+    >
+      <Minus size={16} />
+    </button>
+    
+    <input
+      type="number"
+      min="1"
+      value={customQty}
+      onChange={(e) => {
+        const val = parseInt(e.target.value);
+        setCustomQty(isNaN(val) ? 1 : Math.max(1, val));
+      }}
+      className="w-12 text-center font-black text-[#0F172A] bg-transparent outline-none text-sm"
+    />
+
+    <button 
+      onClick={() => setCustomQty((q) => q + 1)} 
+      className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition p-1"
+      type="button"
+    >
+      <Plus size={16} />
+    </button>
+  </div>
+
+  <button
+    onClick={handleAddCustomizedToCart}
+    className="flex-1 bg-[#800020] hover:bg-[#5C0017] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
+  >
+    {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
+  </button>
+</div>
           </div>
         </div>
       )}
