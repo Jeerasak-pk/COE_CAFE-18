@@ -171,13 +171,14 @@ export default function App() {
   const [confirmModalAction, setConfirmModalAction] = useState(null);
 
   // ==========================================
-  // SEPARATE ADMIN FORM STATES (NO OBJECT COMBINING)
+  // SEPARATE ADMIN FORM STATES
   // ==========================================
   const [editingItem, setEditingItem] = useState(null);
   const [hasMultipleSizes, setHasMultipleSizes] = useState(false);
   
-  // State สำหรับกรองหมวดหมู่หน้า Admin รายการสินค้า
+  // State สำหรับกรองหมวดหมู่หน้า Admin รายการสินค้า (หมวดหลัก และ หมวด ย่อย)
   const [adminFilterCategory, setAdminFilterCategory] = useState("all");
+  const [adminFilterSubCategory, setAdminFilterSubCategory] = useState("all");
 
   // State สำหรับค้นหาวัตถุดิบในหน้า Admin สต็อก
   const [ingSearchQuery, setIngSearchQuery] = useState("");
@@ -1560,6 +1561,9 @@ export default function App() {
 
   const activeCategoryObj = initialCategories.find((c) => c.id === selectedCategory);
   const adminSelectedCategoryObj = initialCategories.find((c) => c.id === itemCategoryInput);
+  
+  // หาออบเจกต์หมวดหมู่หลักที่กำลังเลือกใน Admin Filter เพื่อดึงหมวดหมู่ย่อยมาแสดง
+  const adminActiveFilterCatObj = initialCategories.find((c) => c.id === adminFilterCategory);
 
   const filteredItems = menuItems.filter((item) => {
     const subCat = item.sub_category || item.subCategory;
@@ -1569,10 +1573,12 @@ export default function App() {
     return matchesCategory && matchesSubCategory && matchesSearch;
   });
 
-  // กรองรายการสินค้าในหน้า Admin Panel ตามหมวดหมู่ที่เลือก
+  // กรองรายการสินค้าในหน้า Admin Panel ทั้งหมวดหมู่หลัก และหมวดหมู่ย่อย
   const adminFilteredMenuItems = menuItems.filter((item) => {
-    if (adminFilterCategory === "all") return true;
-    return item.category === adminFilterCategory;
+    const matchesCat = adminFilterCategory === "all" || item.category === adminFilterCategory;
+    const itemSub = item.sub_category || item.subCategory;
+    const matchesSub = adminFilterSubCategory === "all" || !adminFilterSubCategory || itemSub === adminFilterSubCategory;
+    return matchesCat && matchesSub;
   });
 
   // กรองรายการวัตถุดิบในหน้า Admin คลังวัตถุดิบ ตามคำค้นหา
@@ -3273,17 +3279,22 @@ export default function App() {
               </div>
 
               <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
-                <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
-                  <h2 className="text-base font-black text-[#0F172A]">
-                    รายการสินค้าทั้งหมด ({adminFilteredMenuItems.length} / {menuItems.length} รายการ)
-                  </h2>
+                <div className="flex flex-col gap-3 mb-5">
+                  <div className="flex justify-between items-center flex-wrap gap-2">
+                    <h2 className="text-base font-black text-[#0F172A]">
+                      รายการสินค้าทั้งหมด ({adminFilteredMenuItems.length} / {menuItems.length} รายการ)
+                    </h2>
+                  </div>
 
-                  {/* เพิ่มปุ่มกรองหมวดหมู่ฝั่งตารางรายการสินค้า (รวม Signature) */}
-                  <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-2xl border border-[#E2E8F0]">
+                  {/* ปุ่มกรองหมวดหมู่หลักใน Admin Panel */}
+                  <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1.5 rounded-2xl border border-[#E2E8F0] flex-wrap">
                     <button
                       type="button"
-                      onClick={() => setAdminFilterCategory("all")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                      onClick={() => {
+                        setAdminFilterCategory("all");
+                        setAdminFilterSubCategory("all");
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                         adminFilterCategory === "all"
                           ? "bg-[#800020] text-white shadow-xs"
                           : "text-[#64748B] hover:text-[#0F172A]"
@@ -3293,8 +3304,11 @@ export default function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAdminFilterCategory("signature")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1 ${
+                      onClick={() => {
+                        setAdminFilterCategory("signature");
+                        setAdminFilterSubCategory("all");
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1 ${
                         adminFilterCategory === "signature"
                           ? "bg-[#800020] text-white shadow-xs"
                           : "text-[#64748B] hover:text-[#0F172A]"
@@ -3304,8 +3318,11 @@ export default function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAdminFilterCategory("coffee")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                      onClick={() => {
+                        setAdminFilterCategory("coffee");
+                        setAdminFilterSubCategory("all");
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                         adminFilterCategory === "coffee"
                           ? "bg-[#800020] text-white shadow-xs"
                           : "text-[#64748B] hover:text-[#0F172A]"
@@ -3315,8 +3332,11 @@ export default function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAdminFilterCategory("non-coffee")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                      onClick={() => {
+                        setAdminFilterCategory("non-coffee");
+                        setAdminFilterSubCategory("all");
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                         adminFilterCategory === "non-coffee"
                           ? "bg-[#800020] text-white shadow-xs"
                           : "text-[#64748B] hover:text-[#0F172A]"
@@ -3326,8 +3346,11 @@ export default function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAdminFilterCategory("bakery")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                      onClick={() => {
+                        setAdminFilterCategory("bakery");
+                        setAdminFilterSubCategory("all");
+                      }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
                         adminFilterCategory === "bakery"
                           ? "bg-[#800020] text-white shadow-xs"
                           : "text-[#64748B] hover:text-[#0F172A]"
@@ -3336,6 +3359,27 @@ export default function App() {
                       Bakery
                     </button>
                   </div>
+
+                  {/* ปุ่มกรองหมวดหมู่ย่อย (จะแสดงขึ้นมาตามหมวดหมู่หลักที่เลือก) */}
+                  {adminActiveFilterCatObj?.subCategories && adminActiveFilterCatObj.subCategories.length > 0 && (
+                    <div className="flex items-center gap-1.5 pl-1 flex-wrap animate-fadeIn">
+                      <span className="text-[11px] font-bold text-[#94A3B8] mr-1">หมวดหมู่ย่อย:</span>
+                      {adminActiveFilterCatObj.subCategories.map((sub) => (
+                        <button
+                          key={sub.id}
+                          type="button"
+                          onClick={() => setAdminFilterSubCategory(sub.id)}
+                          className={`px-3 py-1 rounded-xl text-[11px] font-bold transition cursor-pointer ${
+                            adminFilterSubCategory === sub.id
+                              ? "bg-[#1E293B] text-[#D4AF37] shadow-xs"
+                              : "bg-[#FEF3C7]/60 text-[#B45309] hover:bg-[#FEF3C7] border border-[#F59E0B]/20"
+                          }`}
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="overflow-x-auto">
@@ -3351,66 +3395,74 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#F1F5F9]">
-                      {adminFilteredMenuItems.map((item) => {
-                        const inStock = isItemInStock(item);
-                        const subCat = item.sub_category || item.subCategory;
-                        const hasSizes = item.sizes && item.sizes.length > 0;
+                      {adminFilteredMenuItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-[#94A3B8] font-bold">
+                            ไม่พบรายการสินค้าในหมวดหมู่นี้
+                          </td>
+                        </tr>
+                      ) : (
+                        adminFilteredMenuItems.map((item) => {
+                          const inStock = isItemInStock(item);
+                          const subCat = item.sub_category || item.subCategory;
+                          const hasSizes = item.sizes && item.sizes.length > 0;
 
-                        return (
-                          <tr key={item.id} className="hover:bg-[#FAF7F2] transition">
-                            <td className="py-3.5 flex items-center gap-3">
-                              <img src={item.image} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 shadow-xs" />
-                              <span className="font-extrabold text-[#0F172A] flex items-center gap-1">
-                                {item.name}
-                                {item.category === "signature" && <Star size={12} className="text-[#F59E0B]" fill="currentColor" />}
-                              </span>
-                            </td>
-                            <td className="py-3.5 text-[#64748B]">
-                              <span className="capitalize font-bold text-[#0F172A]">{item.category}</span>
-                              {subCat && subCat !== "all" && (
-                                <span className="text-[10px] bg-[#FEF3C7] text-[#B45309] px-2 py-0.5 rounded-md ml-1.5 font-bold uppercase">
-                                  {subCat}
+                          return (
+                            <tr key={item.id} className="hover:bg-[#FAF7F2] transition">
+                              <td className="py-3.5 flex items-center gap-3">
+                                <img src={item.image} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 shadow-xs" />
+                                <span className="font-extrabold text-[#0F172A] flex items-center gap-1">
+                                  {item.name}
+                                  {item.category === "signature" && <Star size={12} className="text-[#F59E0B]" fill="currentColor" />}
                                 </span>
-                              )}
-                            </td>
-                            <td className="py-3.5">
-                              {hasSizes ? (
-                                <div className="flex flex-wrap gap-1">
-                                  {item.sizes.map((s, idx) => (
-                                    <span key={idx} className="text-[10px] bg-[#FEF3C7] border border-[#800020]/20 text-[#800020] font-black px-2 py-0.5 rounded-md">
-                                      {s.name} (฿{s.price})
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-[#94A3B8] italic text-[11px]">ขนาดเดียว</span>
-                              )}
-                            </td>
-                            <td className="py-3.5">
-                              {inStock ? (
-                                <span className="text-[11px] text-[#059669] bg-[#D1FAE5] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#10B981]/20">
-                                  <CheckCircle2 size={12} /> พร้อมขาย
-                                </span>
-                              ) : (
-                                <span className="text-[11px] text-[#EF4444] bg-[#FEF2F2] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#FCA5A5]">
-                                  <XCircle size={12} /> {!(item.in_stock ?? item.inStock) ? "ปิดขาย" : "วัตถุดิบหมด"}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-3.5 font-black text-[#800020]">
-                              {hasSizes ? `฿${item.sizes[0].price}+` : `฿${Number(item.price).toFixed(2)}`}
-                            </td>
-                            <td className="py-3.5 text-right space-x-2">
-                              <button onClick={() => handleEditClick(item)} className="p-2 text-[#64748B] hover:text-[#800020] hover:bg-[#FEF3C7] rounded-xl transition cursor-pointer">
-                                <Edit3 size={16} />
-                              </button>
-                              <button onClick={() => handleDeleteItem(item.id)} className="p-2 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl transition cursor-pointer">
-                                <Trash2 size={16} />
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                              <td className="py-3.5 text-[#64748B]">
+                                <span className="capitalize font-bold text-[#0F172A]">{item.category}</span>
+                                {subCat && subCat !== "all" && (
+                                  <span className="text-[10px] bg-[#FEF3C7] text-[#B45309] px-2 py-0.5 rounded-md ml-1.5 font-bold uppercase">
+                                    {subCat}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5">
+                                {hasSizes ? (
+                                  <div className="flex flex-wrap gap-1">
+                                    {item.sizes.map((s, idx) => (
+                                      <span key={idx} className="text-[10px] bg-[#FEF3C7] border border-[#800020]/20 text-[#800020] font-black px-2 py-0.5 rounded-md">
+                                        {s.name} (฿{s.price})
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-[#94A3B8] italic text-[11px]">ขนาดเดียว</span>
+                                )}
+                              </td>
+                              <td className="py-3.5">
+                                {inStock ? (
+                                  <span className="text-[11px] text-[#059669] bg-[#D1FAE5] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#10B981]/20">
+                                    <CheckCircle2 size={12} /> พร้อมขาย
+                                  </span>
+                                ) : (
+                                  <span className="text-[11px] text-[#EF4444] bg-[#FEF2F2] px-3 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit border border-[#FCA5A5]">
+                                    <XCircle size={12} /> {!(item.in_stock ?? item.inStock) ? "ปิดขาย" : "วัตถุดิบหมด"}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5 font-black text-[#800020]">
+                                {hasSizes ? `฿${item.sizes[0].price}+` : `฿${Number(item.price).toFixed(2)}`}
+                              </td>
+                              <td className="py-3.5 text-right space-x-2">
+                                <button onClick={() => handleEditClick(item)} className="p-2 text-[#64748B] hover:text-[#800020] hover:bg-[#FEF3C7] rounded-xl transition cursor-pointer">
+                                  <Edit3 size={16} />
+                                </button>
+                                <button onClick={() => handleDeleteItem(item.id)} className="p-2 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl transition cursor-pointer">
+                                  <Trash2 size={16} />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
