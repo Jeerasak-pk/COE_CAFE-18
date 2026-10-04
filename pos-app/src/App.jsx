@@ -4234,13 +4234,6 @@ export default function App() {
     {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
   </button>
 </div>
-
-  <button
-    onClick={handleAddCustomizedToCart}
-    className="flex-1 bg-[#800020] hover:bg-[#5C0017] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
-  >
-    {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
-  </button>
 </div>
           </div>
         </div>
