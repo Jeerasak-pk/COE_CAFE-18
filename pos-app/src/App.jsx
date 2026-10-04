@@ -163,6 +163,9 @@ export default function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [hasMultipleSizes, setHasMultipleSizes] = useState(false);
   
+  // State สำหรับกรองหมวดหมู่หน้า Admin รายการสินค้า
+  const [adminFilterCategory, setAdminFilterCategory] = useState("all");
+
   // Explicit Item Form Input States
   const [itemNameInput, setItemNameInput] = useState("");
   const [itemPriceInput, setItemPriceInput] = useState("");
@@ -1548,6 +1551,12 @@ export default function App() {
     const matchesSubCategory = selectedSubCategory === "all" || !selectedSubCategory || subCat === selectedSubCategory;
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSubCategory && matchesSearch;
+  });
+
+  // กรองรายการสินค้าในหน้า Admin Panel ตามหมวดหมู่ที่เลือก
+  const adminFilteredMenuItems = menuItems.filter((item) => {
+    if (adminFilterCategory === "all") return true;
+    return item.category === adminFilterCategory;
   });
 
   return (
@@ -3076,7 +3085,60 @@ export default function App() {
               </div>
 
               <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
-                <h2 className="text-base font-black text-[#0F172A] mb-5">รายการสินค้าทั้งหมด ({menuItems.length} รายการ)</h2>
+                <div className="flex justify-between items-center mb-5 flex-wrap gap-3">
+                  <h2 className="text-base font-black text-[#0F172A]">
+                    รายการสินค้าทั้งหมด ({adminFilteredMenuItems.length} / {menuItems.length} รายการ)
+                  </h2>
+
+                  {/* เพิ่มปุ่มกรองหมวดหมู่ฝั่งตารางรายการสินค้า */}
+                  <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-2xl border border-[#E2E8F0]">
+                    <button
+                      type="button"
+                      onClick={() => setAdminFilterCategory("all")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        adminFilterCategory === "all"
+                          ? "bg-[#800020] text-white shadow-xs"
+                          : "text-[#64748B] hover:text-[#0F172A]"
+                      }`}
+                    >
+                      ทั้งหมด
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdminFilterCategory("coffee")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        adminFilterCategory === "coffee"
+                          ? "bg-[#800020] text-white shadow-xs"
+                          : "text-[#64748B] hover:text-[#0F172A]"
+                      }`}
+                    >
+                      Coffee
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdminFilterCategory("non-coffee")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        adminFilterCategory === "non-coffee"
+                          ? "bg-[#800020] text-white shadow-xs"
+                          : "text-[#64748B] hover:text-[#0F172A]"
+                      }`}
+                    >
+                      Non-Coffee
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdminFilterCategory("bakery")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
+                        adminFilterCategory === "bakery"
+                          ? "bg-[#800020] text-white shadow-xs"
+                          : "text-[#64748B] hover:text-[#0F172A]"
+                      }`}
+                    >
+                      Bakery
+                    </button>
+                  </div>
+                </div>
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
@@ -3090,7 +3152,7 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#F1F5F9]">
-                      {menuItems.map((item) => {
+                      {adminFilteredMenuItems.map((item) => {
                         const inStock = isItemInStock(item);
                         const subCat = item.sub_category || item.subCategory;
                         const hasSizes = item.sizes && item.sizes.length > 0;
