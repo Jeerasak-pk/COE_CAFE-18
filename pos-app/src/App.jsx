@@ -52,6 +52,8 @@ import {
 // ==========================================
 // CONSTANTS & INITIAL DATA
 // ==========================================
+const MANAGEMENT_PIN = "1234"; // รหัสผ่านสำหรับปลดล็อกแอดมิน
+
 const initialCategories = [
   { 
     id: "all", 
@@ -175,6 +177,9 @@ export default function App() {
   
   // State สำหรับกรองหมวดหมู่หน้า Admin รายการสินค้า
   const [adminFilterCategory, setAdminFilterCategory] = useState("all");
+
+  // State สำหรับค้นหาวัตถุดิบในหน้า Admin สต็อก
+  const [ingSearchQuery, setIngSearchQuery] = useState("");
 
   // Explicit Item Form Input States
   const [itemNameInput, setItemNameInput] = useState("");
@@ -334,12 +339,6 @@ export default function App() {
   useEffect(() => {
     fetchAllData();
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsManagementAuthenticated(true);
-      }
-    });
-
     const realtimeChannel = supabase
       .channel("pos-realtime-all-tables")
       .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, () => fetchMenuItems())
@@ -414,25 +413,20 @@ export default function App() {
     }
   };
 
-  // กำหนดรหัส PIN ตรงนี้ได้เลย (อยากเปลี่ยนเป็นเลขอะไรแก้ตรงนี้ได้ทันที)
-const MANAGEMENT_PIN = "1234";
+  const handleAuthSubmit = (e) => {
+    e.preventDefault();
+    setPinError("");
 
-const handleAuthSubmit = (e) => {
-  e.preventDefault();
-  setPinError("");
+    if (pinInput === MANAGEMENT_PIN) {
+      setIsManagementAuthenticated(true);
+      setIsAuthModalOpen(false);
+      setActiveTab(targetTabAfterAuth);
+    } else {
+      setPinError("รหัส PIN ไม่ถูกต้อง");
+    }
+  };
 
-  // เช็ค PIN ตรงๆ กับตัวแปรข้างบน
-  if (pinInput === MANAGEMENT_PIN) {
-    setIsManagementAuthenticated(true);
-    setIsAuthModalOpen(false);
-    setActiveTab(targetTabAfterAuth);
-  } else {
-    setPinError("รหัส PIN ไม่ถูกต้อง");
-  }
-};
-
-  const handleLogoutConfirm = async () => {
-    await supabase.auth.signOut();
+  const handleLogoutConfirm = () => {
     setIsManagementAuthenticated(false);
     setIsLogoutModalOpen(false);
     setActiveTab("pos");
@@ -1555,6 +1549,11 @@ const handleAuthSubmit = (e) => {
     if (adminFilterCategory === "all") return true;
     return item.category === adminFilterCategory;
   });
+
+  // กรองรายการวัตถุดิบในหน้า Admin คลังวัตถุดิบ ตามคำค้นหา
+  const filteredIngredients = ingredients.filter((ing) =>
+    ing.name.toLowerCase().includes(ingSearchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex h-screen bg-[#FAF7F2] text-[#2D2422] font-sans antialiased overflow-hidden selection:bg-[#800020] selection:text-white">
@@ -3339,43 +3338,74 @@ const handleAuthSubmit = (e) => {
               </div>
 
               <div className="col-span-2 bg-white p-6 rounded-3xl border border-[#E2E8F0] shadow-xs">
-                <h2 className="text-base font-black text-[#0F172A] mb-5">คลังวัตถุดิบจริงทั้งหมด ({ingredients.length} รายการ)</h2>
-                <div className="space-y-3">
-                  {ingredients.map((ing) => {
-                    const minStock = ing.min_stock ?? ing.minStock ?? 0;
-                    const isLow = ing.stock <= minStock;
-                    return (
-                      <div
-                        key={ing.id}
-                        className={`p-4 rounded-2xl border ${isLow ? "bg-[#FEF2F2] border-[#FCA5A5]" : "bg-[#FAF7F2] border-[#F1F5F9]"} flex justify-between items-center transition`}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                  <h2 className="text-base font-black text-[#0F172A]">
+                    คลังวัตถุดิบจริงทั้งหมด ({filteredIngredients.length} / {ingredients.length} รายการ)
+                  </h2>
+
+                  {/* ช่องค้นหาวัตถุดิบ Search Engine */}
+                  <div className="relative w-full sm:w-64">
+                    <Search className="absolute left-3.5 top-2.5 text-[#94A3B8]" size={15} />
+                    <input
+                      type="text"
+                      placeholder="ค้นหาชื่อวัตถุดิบ..."
+                      value={ingSearchQuery}
+                      onChange={(e) => setIngSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-8 py-2 bg-[#FAF7F2] border border-[#E2E8F0] rounded-xl text-xs font-semibold text-[#0F172A] outline-none focus:ring-2 focus:ring-[#800020] transition placeholder:text-[#94A3B8]"
+                    />
+                    {ingSearchQuery && (
+                      <button
+                        onClick={() => setIngSearchQuery("")}
+                        className="absolute right-2.5 top-2.5 text-[#94A3B8] hover:text-[#0F172A]"
                       >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-xs text-[#0F172A]">{ing.name}</span>
-                            {isLow && (
-                              <span className="text-[10px] bg-[#EF4444] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-xs">
-                                <AlertTriangle size={10} /> วัตถุดิบใกล้หมด
-                              </span>
-                            )}
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
+                  {filteredIngredients.length === 0 ? (
+                    <div className="text-center py-12 text-[#94A3B8] text-xs font-semibold bg-[#FAF7F2] rounded-2xl border border-dashed border-[#E2E8F0]">
+                      ไม่พบวัตถุดิบที่ค้นหา "{ingSearchQuery}"
+                    </div>
+                  ) : (
+                    filteredIngredients.map((ing) => {
+                      const minStock = ing.min_stock ?? ing.minStock ?? 0;
+                      const isLow = ing.stock <= minStock;
+                      return (
+                        <div
+                          key={ing.id}
+                          className={`p-4 rounded-2xl border ${isLow ? "bg-[#FEF2F2] border-[#FCA5A5]" : "bg-[#FAF7F2] border-[#F1F5F9]"} flex justify-between items-center transition`}
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-xs text-[#0F172A]">{ing.name}</span>
+                              {isLow && (
+                                <span className="text-[10px] bg-[#EF4444] text-white px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-xs">
+                                  <AlertTriangle size={10} /> วัตถุดิบใกล้หมด
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[#64748B] font-medium mt-1">
+                              คงเหลือ: <span className="font-black text-[#800020]">{ing.stock}</span> {ing.unit} (ขั้นต่ำ: {minStock} {ing.unit})
+                            </p>
                           </div>
-                          <p className="text-xs text-[#64748B] font-medium mt-1">
-                            คงเหลือ: <span className="font-black text-[#800020]">{ing.stock}</span> {ing.unit} (ขั้นต่ำ: {minStock} {ing.unit})
-                          </p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleAddIngredientStock(ing.id, ing.stock, ing.name, ing.unit)}
+                              className="bg-[#800020] hover:bg-[#5C0017] text-white px-3.5 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition"
+                            >
+                              + เติมสต็อก
+                            </button>
+                            <button onClick={() => handleDeleteIngredient(ing.id)} className="p-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl cursor-pointer transition">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleAddIngredientStock(ing.id, ing.stock, ing.name, ing.unit)}
-                            className="bg-[#800020] hover:bg-[#5C0017] text-white px-3.5 py-2 rounded-xl font-bold text-xs cursor-pointer shadow-xs transition"
-                          >
-                            + เติมสต็อก
-                          </button>
-                          <button onClick={() => handleDeleteIngredient(ing.id)} className="p-2 text-[#EF4444] hover:bg-[#FEF2F2] rounded-xl cursor-pointer transition">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
