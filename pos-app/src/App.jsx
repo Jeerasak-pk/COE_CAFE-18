@@ -4186,9 +4186,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
-  {/* ปรับแก้ตรงนี้: เปลี่ยนจากตัวเลขธรรมดาให้เป็นช่อง input type="number" ให้พิมพ์ได้ */}
-  <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2] items-center">
+            <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2] items-center">
   <div className="flex items-center gap-1 border border-[#E2E8F0] bg-white px-3 py-1.5 rounded-2xl shadow-xs shrink-0">
     <button 
       onClick={() => setCustomQty((q) => Math.max(1, (Number(q) || 1) - 1))} 
@@ -4233,7 +4231,6 @@ export default function App() {
   >
     {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
   </button>
-</div>
 </div>
           </div>
         </div>
