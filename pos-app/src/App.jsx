@@ -316,7 +316,7 @@ export default function App() {
   };
 
   const fetchOrders = async () => {
-    const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: true });
     if (!error && data) {
       const formatted = data.map((orderItem) => {
         const orderDateObj = new Date(orderItem.created_at);
