@@ -414,29 +414,22 @@ export default function App() {
     }
   };
 
-  const handleAuthSubmit = async (e) => {
-    e.preventDefault();
-    setPinError("");
+  // กำหนดรหัส PIN ตรงนี้ได้เลย (อยากเปลี่ยนเป็นเลขอะไรแก้ตรงนี้ได้ทันที)
+const MANAGEMENT_PIN = "1234";
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: "admin@sweetgear.cafe",
-        password: pinInput
-      });
+const handleAuthSubmit = (e) => {
+  e.preventDefault();
+  setPinError("");
 
-      if (error) {
-        setPinError("รหัสผ่านไม่ถูกต้อง");
-      } else {
-        if (data.session) {
-          setIsManagementAuthenticated(true);
-          setIsAuthModalOpen(false);
-          setActiveTab(targetTabAfterAuth);
-        }
-      }
-    } catch (err) {
-      setPinError("เกิดข้อผิดพลาดในการเชื่อมต่อระบบ");
-    }
-  };
+  // เช็ค PIN ตรงๆ กับตัวแปรข้างบน
+  if (pinInput === MANAGEMENT_PIN) {
+    setIsManagementAuthenticated(true);
+    setIsAuthModalOpen(false);
+    setActiveTab(targetTabAfterAuth);
+  } else {
+    setPinError("รหัส PIN ไม่ถูกต้อง");
+  }
+};
 
   const handleLogoutConfirm = async () => {
     await supabase.auth.signOut();
