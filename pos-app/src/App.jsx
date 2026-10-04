@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabaseClient";
 import {
   ShoppingBag,
@@ -46,7 +46,8 @@ import {
   Flame,
   User,
   AlertCircle,
-  Star
+  Star,
+  ChevronDown
 } from "lucide-react";
 
 // ==========================================
@@ -204,6 +205,13 @@ export default function App() {
   const [selectedIngForRecipe, setSelectedIngForRecipe] = useState("");
   const [recipeIngAmount, setRecipeIngAmount] = useState("");
 
+  // Search States for Dropdown Ingredients
+  const [recipeIngSearchQuery, setRecipeIngSearchQuery] = useState("");
+  const [isRecipeDropdownOpen, setIsRecipeDropdownOpen] = useState(false);
+  
+  const [addonIngSearchQuery, setAddonIngSearchQuery] = useState("");
+  const [isAddonDropdownOpen, setIsAddonDropdownOpen] = useState(false);
+
   // Option Helper Inputs
   const [newSweetnessInput, setNewSweetnessInput] = useState("");
   const [newCoffeeRoastInput, setNewCoffeeRoastInput] = useState("");
@@ -233,6 +241,23 @@ export default function App() {
   const [expCategoryInput, setExpCategoryInput] = useState("raw_material");
   const [expAmountInput, setExpAmountInput] = useState("");
   const [expDateInput, setExpDateInput] = useState(new Date().toISOString().split("T")[0]);
+
+  // Ref for clicking outside dropdowns
+  const recipeDropdownRef = useRef(null);
+  const addonDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (recipeDropdownRef.current && !recipeDropdownRef.current.contains(event.target)) {
+        setIsRecipeDropdownOpen(false);
+      }
+      if (addonDropdownRef.current && !addonDropdownRef.current.contains(event.target)) {
+        setIsAddonDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // ==========================================
   // CONFIRMATION DIALOG HANDLERS
@@ -1555,6 +1580,19 @@ export default function App() {
     ing.name.toLowerCase().includes(ingSearchQuery.toLowerCase())
   );
 
+  // Filtered ingredients for Recipe Select Dropdown
+  const recipeFilteredIngredients = ingredients.filter((ing) =>
+    ing.name.toLowerCase().includes(recipeIngSearchQuery.toLowerCase())
+  );
+
+  // Filtered ingredients for Addon Select Dropdown
+  const addonFilteredIngredients = ingredients.filter((ing) =>
+    ing.name.toLowerCase().includes(addonIngSearchQuery.toLowerCase())
+  );
+
+  const selectedRecipeIngObj = ingredients.find((ing) => ing.id === selectedIngForRecipe);
+  const selectedAddonIngObj = ingredients.find((ing) => ing.id === selectedAddonIngInput);
+
   return (
     <div className="flex h-screen bg-[#FAF7F2] text-[#2D2422] font-sans antialiased overflow-hidden selection:bg-[#800020] selection:text-white">
       <style>{`
@@ -2868,16 +2906,67 @@ export default function App() {
 
                     <div className="pt-2 border-t border-[#E2E8F0] space-y-2">
                       <div className="grid grid-cols-2 gap-2">
-                        <select
-                          value={selectedIngForRecipe}
-                          onChange={(e) => setSelectedIngForRecipe(e.target.value)}
-                          className="p-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold outline-none"
-                        >
-                          <option value="">-- เลือกวัตถุดิบ --</option>
-                          {ingredients.map((ing) => (
-                            <option key={ing.id} value={ing.id}>{ing.name} ({ing.unit})</option>
-                          ))}
-                        </select>
+                        {/* Custom Searchable Dropdown สำหรับเลือกวัตถุดิบในสูตร */}
+                        <div className="relative" ref={recipeDropdownRef}>
+                          <div
+                            onClick={() => setIsRecipeDropdownOpen(!isRecipeDropdownOpen)}
+                            className="p-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold flex justify-between items-center cursor-pointer shadow-xs"
+                          >
+                            <span className="truncate text-[#0F172A]">
+                              {selectedRecipeIngObj ? `${selectedRecipeIngObj.name} (${selectedRecipeIngObj.unit})` : "-- เลือกวัตถุดิบ --"}
+                            </span>
+                            <ChevronDown size={14} className="text-[#94A3B8] shrink-0 ml-1" />
+                          </div>
+
+                          {isRecipeDropdownOpen && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#E2E8F0] rounded-xl shadow-xl z-30 p-2 space-y-1.5 animate-fadeIn">
+                              <div className="relative">
+                                <Search size={13} className="absolute left-2.5 top-2.5 text-[#94A3B8]" />
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  placeholder="พิมพ์ค้นหาชื่อวัตถุดิบ..."
+                                  value={recipeIngSearchQuery}
+                                  onChange={(e) => setRecipeIngSearchQuery(e.target.value)}
+                                  className="w-full pl-8 pr-2 py-1.5 bg-[#FAF7F2] border border-[#E2E8F0] rounded-lg text-xs outline-none font-medium text-[#0F172A]"
+                                />
+                              </div>
+
+                              <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-0.5">
+                                <div
+                                  onClick={() => {
+                                    setSelectedIngForRecipe("");
+                                    setIsRecipeDropdownOpen(false);
+                                    setRecipeIngSearchQuery("");
+                                  }}
+                                  className="p-2 hover:bg-[#FAF7F2] rounded-lg cursor-pointer text-xs font-bold text-[#64748B]"
+                                >
+                                  -- เลือกวัตถุดิบ --
+                                </div>
+                                {recipeFilteredIngredients.length === 0 ? (
+                                  <p className="p-2 text-[11px] text-[#94A3B8] text-center">ไม่พบวัตถุดิบ</p>
+                                ) : (
+                                  recipeFilteredIngredients.map((ing) => (
+                                    <div
+                                      key={ing.id}
+                                      onClick={() => {
+                                        setSelectedIngForRecipe(ing.id);
+                                        setIsRecipeDropdownOpen(false);
+                                        setRecipeIngSearchQuery("");
+                                      }}
+                                      className={`p-2 hover:bg-[#FEF3C7] rounded-lg cursor-pointer text-xs font-bold flex justify-between items-center ${
+                                        selectedIngForRecipe === ing.id ? "bg-[#FEF3C7] text-[#800020]" : "text-[#0F172A]"
+                                      }`}
+                                    >
+                                      <span>{ing.name}</span>
+                                      <span className="text-[10px] text-[#64748B]">({ing.unit})</span>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
                         <input
                           type="number"
@@ -3056,16 +3145,68 @@ export default function App() {
                       </div>
 
                       <div className="grid grid-cols-2 gap-2">
-                        <select
-                          value={selectedAddonIngInput}
-                          onChange={(e) => setSelectedAddonIngInput(e.target.value)}
-                          className="bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
-                        >
-                          <option value="">-- ไม่ตัดวัตถุดิบเพิ่มเติม --</option>
-                          {ingredients.map((ing) => (
-                            <option key={ing.id} value={ing.id}>{ing.name} ({ing.unit})</option>
-                          ))}
-                        </select>
+                        {/* Custom Searchable Dropdown สำหรับเลือกวัตถุดิบผูกตัดสต็อกของท็อปปิ้ง */}
+                        <div className="relative" ref={addonDropdownRef}>
+                          <div
+                            onClick={() => setIsAddonDropdownOpen(!isAddonDropdownOpen)}
+                            className="p-2 bg-white border border-[#E2E8F0] rounded-lg text-xs font-semibold flex justify-between items-center cursor-pointer shadow-xs"
+                          >
+                            <span className="truncate text-[#0F172A]">
+                              {selectedAddonIngObj ? `${selectedAddonIngObj.name} (${selectedAddonIngObj.unit})` : "-- ไม่ตัดวัตถุดิบ --"}
+                            </span>
+                            <ChevronDown size={14} className="text-[#94A3B8] shrink-0 ml-1" />
+                          </div>
+
+                          {isAddonDropdownOpen && (
+                            <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-[#E2E8F0] rounded-xl shadow-xl z-30 p-2 space-y-1.5 animate-fadeIn">
+                              <div className="relative">
+                                <Search size={13} className="absolute left-2.5 top-2.5 text-[#94A3B8]" />
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  placeholder="พิมพ์ค้นหาชื่อวัตถุดิบ..."
+                                  value={addonIngSearchQuery}
+                                  onChange={(e) => setAddonIngSearchQuery(e.target.value)}
+                                  className="w-full pl-8 pr-2 py-1.5 bg-[#FAF7F2] border border-[#E2E8F0] rounded-lg text-xs outline-none font-medium text-[#0F172A]"
+                                />
+                              </div>
+
+                              <div className="max-h-40 overflow-y-auto custom-scrollbar space-y-0.5">
+                                <div
+                                  onClick={() => {
+                                    setSelectedAddonIngInput("");
+                                    setIsAddonDropdownOpen(false);
+                                    setAddonIngSearchQuery("");
+                                  }}
+                                  className="p-2 hover:bg-[#FAF7F2] rounded-lg cursor-pointer text-xs font-bold text-[#64748B]"
+                                >
+                                  -- ไม่ตัดวัตถุดิบเพิ่มเติม --
+                                </div>
+                                {addonFilteredIngredients.length === 0 ? (
+                                  <p className="p-2 text-[11px] text-[#94A3B8] text-center">ไม่พบวัตถุดิบ</p>
+                                ) : (
+                                  addonFilteredIngredients.map((ing) => (
+                                    <div
+                                      key={ing.id}
+                                      onClick={() => {
+                                        setSelectedAddonIngInput(ing.id);
+                                        setIsAddonDropdownOpen(false);
+                                        setAddonIngSearchQuery("");
+                                      }}
+                                      className={`p-2 hover:bg-[#FEF3C7] rounded-lg cursor-pointer text-xs font-bold flex justify-between items-center ${
+                                        selectedAddonIngInput === ing.id ? "bg-[#FEF3C7] text-[#800020]" : "text-[#0F172A]"
+                                      }`}
+                                    >
+                                      <span>{ing.name}</span>
+                                      <span className="text-[10px] text-[#64748B]">({ing.unit})</span>
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         <input
                           type="number"
                           value={addonIngAmountInput}
