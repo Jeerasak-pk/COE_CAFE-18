@@ -45,7 +45,8 @@ import {
   HeartHandshake,
   Flame,
   User,
-  AlertCircle
+  AlertCircle,
+  Star
 } from "lucide-react";
 
 // ==========================================
@@ -56,6 +57,16 @@ const initialCategories = [
     id: "all", 
     name: "ทั้งหมด",
     subCategories: [] 
+  },
+  {
+    id: "signature",
+    name: "Signature",
+    subCategories: [
+      { id: "all", name: "ทั้งหมดใน Signature" },
+      { id: "spec_coffee", name: "Special Coffee" },
+      { id: "spec_non_coffee", name: "Special Non-Coffee" },
+      { id: "chef_rec", name: "Chef's Recommendation" }
+    ]
   },
   {
     id: "coffee",
@@ -119,7 +130,6 @@ export default function App() {
   const [targetTabAfterAuth, setTargetTabAfterAuth] = useState("admin");
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
-  const MANAGEMENT_PIN = "1234";
 
   // Date Filter States for Dashboard
   const initialDateObj = new Date();
@@ -169,8 +179,8 @@ export default function App() {
   // Explicit Item Form Input States
   const [itemNameInput, setItemNameInput] = useState("");
   const [itemPriceInput, setItemPriceInput] = useState("");
-  const [itemCategoryInput, setItemCategoryInput] = useState("coffee");
-  const [itemSubCategoryInput, setItemSubCategoryInput] = useState("hot");
+  const [itemCategoryInput, setItemCategoryInput] = useState("signature");
+  const [itemSubCategoryInput, setItemSubCategoryInput] = useState("spec_coffee");
   const [itemImageInput, setItemImageInput] = useState("");
   const [itemInStockInput, setItemInStockInput] = useState(true);
   const [itemSweetnessTextInput, setItemSweetnessTextInput] = useState("100%, 50%, 0%");
@@ -408,29 +418,23 @@ export default function App() {
     e.preventDefault();
     setPinError("");
 
-    if (pinInput === MANAGEMENT_PIN) {
-      setIsManagementAuthenticated(true);
-      setIsAuthModalOpen(false);
-      setActiveTab(targetTabAfterAuth);
-    } else {
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: "admin@sweetgear.cafe",
-          password: pinInput
-        });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: "admin@sweetgear.cafe",
+        password: pinInput
+      });
 
-        if (error) {
-          setPinError("รหัสผ่านไม่ถูกต้อง");
-        } else {
-          if (data.session) {
-            setIsManagementAuthenticated(true);
-            setIsAuthModalOpen(false);
-            setActiveTab(targetTabAfterAuth);
-          }
-        }
-      } catch (err) {
+      if (error) {
         setPinError("รหัสผ่านไม่ถูกต้อง");
+      } else {
+        if (data.session) {
+          setIsManagementAuthenticated(true);
+          setIsAuthModalOpen(false);
+          setActiveTab(targetTabAfterAuth);
+        }
       }
+    } catch (err) {
+      setPinError("เกิดข้อผิดพลาดในการเชื่อมต่อระบบ");
     }
   };
 
@@ -476,7 +480,7 @@ export default function App() {
       setSweetness("100%");
     }
 
-    if (item.category === "coffee") {
+    if (item.category === "coffee" || item.category === "signature") {
       if (roastOpts.length > 1) {
         setCoffeeRoast(roastOpts[1]);
       } else if (roastOpts.length > 0) {
@@ -1229,8 +1233,8 @@ export default function App() {
     setHasMultipleSizes(false);
     setItemNameInput("");
     setItemPriceInput("");
-    setItemCategoryInput("coffee");
-    setItemSubCategoryInput("hot");
+    setItemCategoryInput("signature");
+    setItemSubCategoryInput("spec_coffee");
     setItemImageInput("");
     setItemInStockInput(true);
     setItemSweetnessTextInput("100%, 50%, 0%");
@@ -1449,7 +1453,7 @@ export default function App() {
 
   const dailyBreakdown = getDailyBreakdownForSelectedMonth();
 
-  const catSales = { coffee: 0, "non-coffee": 0, bakery: 0 };
+  const catSales = { signature: 0, coffee: 0, "non-coffee": 0, bakery: 0 };
   for (let o = 0; o < filteredDashboardOrders.length; o++) {
     const items = filteredDashboardOrders[o].items;
     for (let i = 0; i < items.length; i++) {
@@ -1714,6 +1718,7 @@ export default function App() {
               </div>
             </header>
 
+            {/* ปุ่มเลือกรวม Signature */}
             <div className="flex gap-3 mb-3">
               {initialCategories.map((cat) => (
                 <button
@@ -1722,12 +1727,13 @@ export default function App() {
                     setSelectedCategory(cat.id);
                     setSelectedSubCategory("all");
                   }}
-                  className={`px-6 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer ${
+                  className={`px-6 py-2.5 rounded-2xl text-xs font-black transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
                     selectedCategory === cat.id
                       ? "bg-[#800020] text-white shadow-lg shadow-[#800020]/25 border border-[#800020] -translate-y-0.5"
                       : "bg-white text-[#334155] hover:bg-[#FEF3C7] border border-[#E2E8F0] shadow-xs"
                   }`}
                 >
+                  {cat.id === "signature" && <Star size={13} className={selectedCategory === "signature" ? "text-[#D4AF37]" : "text-[#F59E0B]"} />}
                   {cat.name}
                 </button>
               ))}
@@ -1770,6 +1776,12 @@ export default function App() {
                           : "opacity-60 cursor-not-allowed"
                       }`}
                     >
+                      {item.category === "signature" && (
+                        <span className="absolute top-3 left-3 bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-[#0F172A] text-[9px] font-black px-2.5 py-0.5 rounded-full z-10 shadow-md flex items-center gap-1 uppercase tracking-wider">
+                          <Star size={10} fill="currentColor" /> Signature
+                        </span>
+                      )}
+
                       {!inStock && (
                         <span className="absolute top-3 right-3 bg-[#EF4444] text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full z-10 shadow-md uppercase tracking-wider">
                           {!(item.in_stock ?? item.inStock) ? "สินค้าหมด" : "วัตถุดิบหมด"}
@@ -1849,7 +1861,10 @@ export default function App() {
                       className="flex justify-between items-center bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#E2E8F0] hover:border-[#800020] transition duration-200 shadow-xs relative group"
                     >
                       <div className="max-w-[170px]">
-                        <p className="font-extrabold text-[#0F172A] text-xs">{item.name}</p>
+                        <p className="font-extrabold text-[#0F172A] text-xs flex items-center gap-1">
+                          {item.name}
+                          {item.category === "signature" && <Star size={11} className="text-[#F59E0B]" fill="currentColor" />}
+                        </p>
                         <p className="text-[10px] font-semibold text-[#64748B] truncate mt-0.5">{item.optionsText}</p>
 
                         {item.noteText && (
@@ -1983,6 +1998,7 @@ export default function App() {
           ) : (
             <div className="grid grid-cols-3 gap-6 items-start">
               {kitchenOrders.map((order) => {
+                const sigItems = order.items.filter((i) => i.category === "signature");
                 const coffeeItems = order.items.filter((i) => i.category === "coffee");
                 const nonCoffeeItems = order.items.filter((i) => i.category === "non-coffee");
                 const bakeryItems = order.items.filter((i) => i.category === "bakery");
@@ -2026,6 +2042,31 @@ export default function App() {
                     </div>
 
                     <div className="p-4.5 space-y-4 flex-1 overflow-y-auto bg-[#0F172A] custom-scrollbar">
+                      {sigItems.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-black text-[#F59E0B] uppercase tracking-wider mb-2 border-b border-[#334155] pb-1 flex justify-between items-center">
+                            <span className="flex items-center gap-1"><Star size={11} fill="currentColor" /> SIGNATURE</span>
+                            <span>{sigItems.length} รายการ</span>
+                          </p>
+                          <div className="space-y-2.5">
+                            {sigItems.map((item, idx) => (
+                              <div key={idx} className="bg-[#FAF7F2] text-[#0F172A] p-3 rounded-2xl border border-[#F59E0B]/50 shadow-xs">
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="font-extrabold text-xs leading-snug">{item.name}</span>
+                                  <span className="bg-[#800020] text-white text-xs font-black px-2 py-0.5 rounded-lg shrink-0">x{item.qty}</span>
+                                </div>
+                                <p className="text-[11px] font-bold text-[#64748B] mt-1">{item.optionsText}</p>
+                                {item.noteText && (
+                                  <p className="text-[11px] font-bold text-[#EF4444] bg-[#FEF2F2] p-1.5 rounded-lg mt-1.5 border border-[#FCA5A5] flex items-center gap-1">
+                                    <FileText size={12} className="shrink-0" /> * {item.noteText}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {coffeeItems.length > 0 && (
                         <div>
                           <p className="text-[10px] font-black text-[#D4AF37] uppercase tracking-wider mb-2 border-b border-[#334155] pb-1 flex justify-between">
@@ -2440,6 +2481,19 @@ export default function App() {
                 <div className="space-y-4 text-xs">
                   <div>
                     <div className="flex justify-between font-bold mb-1.5">
+                      <span className="flex items-center gap-1"><Star size={12} className="text-[#F59E0B]" fill="currentColor" /> Signature</span>
+                      <span className="text-[#800020] font-black">฿{catSales.signature.toFixed(2)}</span>
+                    </div>
+                    <div className="w-full bg-[#F1F5F9] h-2.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#F59E0B] h-full transition-all duration-500 rounded-full"
+                        style={{ width: `${filterRevenue > 0 ? (catSales.signature / filterRevenue) * 100 : 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between font-bold mb-1.5">
                       <span>Coffee</span>
                       <span className="text-[#800020] font-black">฿{catSales.coffee.toFixed(2)}</span>
                     </div>
@@ -2635,6 +2689,7 @@ export default function App() {
                         }}
                         className="w-full p-3 bg-[#FAF7F2] border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#800020] outline-none text-[#0F172A] font-bold transition"
                       >
+                        <option value="signature">Signature</option>
                         <option value="coffee">Coffee</option>
                         <option value="non-coffee">Non-Coffee</option>
                         <option value="bakery">Bakery</option>
@@ -2851,7 +2906,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {itemCategoryInput === "coffee" && (
+                  {(itemCategoryInput === "coffee" || itemCategoryInput === "signature") && (
                     <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
                       <label className="font-extrabold text-[#334155] block flex items-center gap-1">
                         <Flame size={14} className="text-[#800020]" /> ตัวเลือกระดับความเข้มกาแฟ / เมล็ดคั่ว
@@ -3064,8 +3119,8 @@ export default function App() {
                           setHasMultipleSizes(false);
                           setItemNameInput("");
                           setItemPriceInput("");
-                          setItemCategoryInput("coffee");
-                          setItemSubCategoryInput("hot");
+                          setItemCategoryInput("signature");
+                          setItemSubCategoryInput("spec_coffee");
                           setItemImageInput("");
                           setItemInStockInput(true);
                           setItemSweetnessTextInput("100%, 50%, 0%");
@@ -3090,7 +3145,7 @@ export default function App() {
                     รายการสินค้าทั้งหมด ({adminFilteredMenuItems.length} / {menuItems.length} รายการ)
                   </h2>
 
-                  {/* เพิ่มปุ่มกรองหมวดหมู่ฝั่งตารางรายการสินค้า */}
+                  {/* เพิ่มปุ่มกรองหมวดหมู่ฝั่งตารางรายการสินค้า (รวม Signature) */}
                   <div className="flex items-center gap-1.5 bg-[#FAF7F2] p-1 rounded-2xl border border-[#E2E8F0]">
                     <button
                       type="button"
@@ -3102,6 +3157,17 @@ export default function App() {
                       }`}
                     >
                       ทั้งหมด
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdminFilterCategory("signature")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1 ${
+                        adminFilterCategory === "signature"
+                          ? "bg-[#800020] text-white shadow-xs"
+                          : "text-[#64748B] hover:text-[#0F172A]"
+                      }`}
+                    >
+                      <Star size={11} fill="currentColor" /> Signature
                     </button>
                     <button
                       type="button"
@@ -3161,7 +3227,10 @@ export default function App() {
                           <tr key={item.id} className="hover:bg-[#FAF7F2] transition">
                             <td className="py-3.5 flex items-center gap-3">
                               <img src={item.image} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0 shadow-xs" />
-                              <span className="font-extrabold text-[#0F172A]">{item.name}</span>
+                              <span className="font-extrabold text-[#0F172A] flex items-center gap-1">
+                                {item.name}
+                                {item.category === "signature" && <Star size={12} className="text-[#F59E0B]" fill="currentColor" />}
+                              </span>
                             </td>
                             <td className="py-3.5 text-[#64748B]">
                               <span className="capitalize font-bold text-[#0F172A]">{item.category}</span>
@@ -3726,7 +3795,10 @@ export default function App() {
               <div className="flex items-center gap-4">
                 <img src={selectedItemForCustom.image} alt="" className="w-14 h-14 rounded-2xl object-cover border border-[#334155] shadow-md" />
                 <div>
-                  <h3 className="font-black text-base text-[#F8FAFC]">{selectedItemForCustom.name}</h3>
+                  <h3 className="font-black text-base text-[#F8FAFC] flex items-center gap-1.5">
+                    {selectedItemForCustom.name}
+                    {selectedItemForCustom.category === "signature" && <Star size={14} className="text-[#F59E0B]" fill="currentColor" />}
+                  </h3>
                   <p className="text-xs font-bold text-[#D4AF37] mt-0.5">
                     {selectedSize ? `ขนาด ${selectedSize.name} • ฿${selectedSize.price}` : `เริ่มต้น ฿${selectedItemForCustom.price}`}
                   </p>
@@ -3776,7 +3848,7 @@ export default function App() {
                 </div>
               )}
 
-              {selectedItemForCustom.category === "coffee" && (
+              {(selectedItemForCustom.category === "coffee" || selectedItemForCustom.category === "signature") && (
                 <div>
                   <label className="font-black text-[#800020] text-[11px] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
                     <Flame size={15} /> ระดับความเข้มกาแฟ / เมล็ดคั่ว (Coffee Roast)
