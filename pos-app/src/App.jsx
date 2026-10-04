@@ -328,7 +328,7 @@ export default function App() {
           queueNo: orderItem.queue_no,
           customerName: orderItem.customer_name || "",
           total: orderItem.total,
-          status: orderItem.status,
+          status: orderItem.status || "pending",
           orderType: orderItem.order_type,
           paymentMethod: orderItem.payment_method,
           items: orderItem.items || [],
@@ -343,8 +343,9 @@ export default function App() {
 
       setOrderHistory(formatted);
 
+      // แก้ไข: รองรับสถานะว่างหรือ pending/preparing เพื่อให้ออเดอร์เข้าหน้าจอครัวทันที
       const activeKitchenList = formatted.filter((o) => {
-        return o.status === "pending" || o.status === "preparing";
+        return o.status === "pending" || o.status === "preparing" || !o.status;
       });
       setKitchenOrders(activeKitchenList);
 
@@ -720,6 +721,9 @@ export default function App() {
     }
   };
 
+  // ==========================================
+  // PAYMENT PROCESSOR (UPDATED: SHOW SLIP IMMEDIATELY & REFRESH KITCHEN)
+  // ==========================================
   const handleProcessPayment = async () => {
     const nowObj = new Date();
     const orderIdStr = `INV-${nowObj.getTime().toString().slice(-6)}`;
@@ -745,6 +749,23 @@ export default function App() {
     try {
       await supabase.from("orders").insert([newOrderObj]);
       await fetchAllData();
+
+      // เพิ่มเติม: กำหนดข้อมูลออเดอร์เพื่อเด้งเปิดสลิปใบเสร็จทันทีหลังชำระเงินสำเร็จ
+      const receiptObj = {
+        id: orderIdStr,
+        queueNo: queueNoStr,
+        customerName: customerName.trim(),
+        items: cart,
+        subtotal: subtotal,
+        discount: effectiveDiscount,
+        total: total,
+        vat: vat,
+        orderType: orderType,
+        paymentMethod: payMethodLabel,
+        date: nowObj.toLocaleDateString("th-TH"),
+        time: nowObj.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })
+      };
+      setActiveReceipt(receiptObj);
     } catch (err) {
       console.error("Error creating order:", err);
     }
@@ -1561,8 +1582,6 @@ export default function App() {
 
   const activeCategoryObj = initialCategories.find((c) => c.id === selectedCategory);
   const adminSelectedCategoryObj = initialCategories.find((c) => c.id === itemCategoryInput);
-  
-  // หาออบเจกต์หมวดหมู่หลักที่กำลังเลือกใน Admin Filter เพื่อดึงหมวดหมู่ย่อยมาแสดง
   const adminActiveFilterCatObj = initialCategories.find((c) => c.id === adminFilterCategory);
 
   const filteredItems = menuItems.filter((item) => {
@@ -1573,7 +1592,6 @@ export default function App() {
     return matchesCategory && matchesSubCategory && matchesSearch;
   });
 
-  // กรองรายการสินค้าในหน้า Admin Panel ทั้งหมวดหมู่หลัก และหมวดหมู่ย่อย
   const adminFilteredMenuItems = menuItems.filter((item) => {
     const matchesCat = adminFilterCategory === "all" || item.category === adminFilterCategory;
     const itemSub = item.sub_category || item.subCategory;
@@ -1581,17 +1599,14 @@ export default function App() {
     return matchesCat && matchesSub;
   });
 
-  // กรองรายการวัตถุดิบในหน้า Admin คลังวัตถุดิบ ตามคำค้นหา
   const filteredIngredients = ingredients.filter((ing) =>
     ing.name.toLowerCase().includes(ingSearchQuery.toLowerCase())
   );
 
-  // Filtered ingredients for Recipe Select Dropdown
   const recipeFilteredIngredients = ingredients.filter((ing) =>
     ing.name.toLowerCase().includes(recipeIngSearchQuery.toLowerCase())
   );
 
-  // Filtered ingredients for Addon Select Dropdown
   const addonFilteredIngredients = ingredients.filter((ing) =>
     ing.name.toLowerCase().includes(addonIngSearchQuery.toLowerCase())
   );
@@ -1754,7 +1769,7 @@ export default function App() {
               </div>
             </header>
 
-            {/* ปุ่มเลือกรวม Signature */}
+            {/* Category Filter */}
             <div className="flex gap-3 mb-3">
               {initialCategories.map((cat) => (
                 <button
@@ -2182,7 +2197,7 @@ export default function App() {
                     </div>
 
                     <div className="p-3.5 bg-[#1E293B] border-t border-[#334155] shrink-0 space-y-2">
-                      {order.status === "pending" ? (
+                      {order.status === "pending" || !order.status ? (
                         <button
                           onClick={() => handleUpdateOrderStatus(order.id, "preparing")}
                           className="w-full bg-[#800020] hover:bg-[#5C0017] text-white font-extrabold py-3 rounded-2xl text-xs transition cursor-pointer flex justify-center items-center gap-1.5 shadow-md uppercase tracking-wider"
@@ -4192,7 +4207,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Receipt Modal */}
+      {/* Active Receipt Modal (แสดงสลิปใบเสร็จทันทีเมื่อชำระเงินสำเร็จ) */}
       {activeReceipt && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div id="thermal-receipt-modal" className="bg-white w-full max-w-sm rounded-3xl p-7 shadow-2xl font-mono text-xs border border-[#E2E8F0] relative overflow-hidden animate-fadeIn">
@@ -4214,8 +4229,8 @@ export default function App() {
             </div>
 
             <div className="space-y-2.5 border-b border-dashed border-[#800020]/30 pb-5 mb-5">
-              {activeReceipt.items.map((item) => (
-                <div key={item.cartId} className="flex justify-between text-[#0F172A]">
+              {activeReceipt.items.map((item, idx) => (
+                <div key={item.cartId || idx} className="flex justify-between text-[#0F172A]">
                   <div>
                     <p className="font-bold">{item.name} x{item.qty}</p>
                     <p className="text-[10px] text-[#64748B] font-sans">{item.optionsText}</p>
@@ -4235,7 +4250,7 @@ export default function App() {
                   <span>ส่วนลด:</span> <span>-฿{activeReceipt.discount.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between font-[#0F172A] font-black text-sm pt-1.5">
+              <div className="flex justify-between text-[#0F172A] font-black text-sm pt-1.5">
                 <span>ยอดรวมสุทธิ (รวม VAT):</span>
                 <span className="text-[#800020]">฿{activeReceipt.total.toFixed(2)}</span>
               </div>
@@ -4321,7 +4336,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Explicit Confirmation Dialog Modal */}
+      {/* Confirmation Modal */}
       {confirmModalOpen && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl p-7 border border-[#E2E8F0] animate-fadeIn text-center">
