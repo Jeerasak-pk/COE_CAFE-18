@@ -4188,9 +4188,10 @@ export default function App() {
 
             <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
   {/* ปรับแก้ตรงนี้: เปลี่ยนจากตัวเลขธรรมดาให้เป็นช่อง input type="number" ให้พิมพ์ได้ */}
+  <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
   <div className="flex items-center gap-2 border border-[#E2E8F0] bg-white px-3 py-1.5 rounded-2xl shadow-xs">
     <button 
-      onClick={() => setCustomQty((q) => Math.max(1, q - 1))} 
+      onClick={() => setCustomQty((q) => Math.max(1, (Number(q) || 1) - 1))} 
       className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition p-1"
       type="button"
     >
@@ -4202,20 +4203,40 @@ export default function App() {
       min="1"
       value={customQty}
       onChange={(e) => {
-        const val = parseInt(e.target.value);
-        setCustomQty(isNaN(val) ? 1 : Math.max(1, val));
+        // อนุญาตให้พิมพ์ลบว่างได้ โดยเก็บค่าเป็น string ชั่วคราว
+        setCustomQty(e.target.value);
       }}
-      className="w-12 text-center font-black text-[#0F172A] bg-transparent outline-none text-sm"
+      onBlur={() => {
+        // เมื่อคลิกออกนอกช่อง (Blur) ถ้าปล่อยว่างหรือค่าน้อยกว่า 1 ให้ปัดกลับเป็น 1 อัตโนมัติ
+        if (customQty === "" || Number(customQty) < 1) {
+          setCustomQty(1);
+        }
+      }}
+      className="w-14 text-center font-black text-[#0F172A] bg-transparent outline-none text-sm"
     />
 
     <button 
-      onClick={() => setCustomQty((q) => q + 1)} 
+      onClick={() => setCustomQty((q) => (Number(q) || 0) + 1)} 
       className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition p-1"
       type="button"
     >
       <Plus size={16} />
     </button>
   </div>
+
+  <button
+    onClick={() => {
+      // ตรวจสอบความถูกต้องก่อนกดเพิ่มลงตะกร้า (ถ้าช่องว่างให้บังคับเป็น 1)
+      if (customQty === "" || Number(customQty) < 1) {
+        setCustomQty(1);
+      }
+      handleAddCustomizedToCart();
+    }}
+    className="flex-1 bg-[#800020] hover:bg-[#5C0017] text-white font-black py-4 rounded-2xl shadow-md cursor-pointer transition text-xs uppercase tracking-wider"
+  >
+    {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
+  </button>
+</div>
 
   <button
     onClick={handleAddCustomizedToCart}
