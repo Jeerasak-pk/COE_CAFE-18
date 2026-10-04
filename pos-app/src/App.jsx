@@ -44,7 +44,8 @@ import {
   Ban,
   Cog,
   Maximize2,
-  HeartHandshake
+  HeartHandshake,
+  Flame
 } from "lucide-react";
 
 const initialCategories = [
@@ -156,48 +157,48 @@ export default function App() {
   };
 
   useEffect(() => {
-  // ดึงข้อมูลครั้งแรกเมื่อเปิดหน้าเว็บ
-  fetchAllData();
+    // ดึงข้อมูลครั้งแรกเมื่อเปิดหน้าเว็บ
+    fetchAllData();
 
-  // สร้าง Realtime Subscription Channel
-  const channel = supabase
-    .channel("pos-realtime-changes")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "menu_items" },
-      (payload) => {
-        console.log("Menu Items updated in realtime!", payload);
-        fetchAllData(); // เรียกดึงข้อมูลใหม่ทันทีที่มีการเพิ่ม/แก้/ลบเมนู
-      }
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "ingredients" },
-      () => fetchAllData()
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "orders" },
-      () => fetchAllData()
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "promotions" },
-      () => fetchAllData()
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "expenses" },
-      () => fetchAllData()
-    )
-    .subscribe((status) => {
-      console.log("Supabase Realtime Status:", status);
-    });
+    // สร้าง Realtime Subscription Channel
+    const channel = supabase
+      .channel("pos-realtime-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "menu_items" },
+        (payload) => {
+          console.log("Menu Items updated in realtime!", payload);
+          fetchAllData();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "ingredients" },
+        () => fetchAllData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => fetchAllData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "promotions" },
+        () => fetchAllData()
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "expenses" },
+        () => fetchAllData()
+      )
+      .subscribe((status) => {
+        console.log("Supabase Realtime Status:", status);
+      });
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, []);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const [adminSubTab, setAdminSubTab] = useState("menu");
 
@@ -230,6 +231,7 @@ export default function App() {
     image: "",
     inStock: true,
     sweetnessText: "100%, 50%, 0%",
+    coffeeRoastText: "คั่วอ่อน, คั่วกลาง (Standard), คั่วเข้ม", // ☕ ตัวเลือกความเข้มกาแฟเริ่มต้น
     milkText: "นมสดธรรมดา (+0), นมโอ๊ต (+20)",
     addonsText: "เพิ่ม Shot กาแฟ (+25), เพิ่ม ไซรัปวานิลลา (+15)",
     recipe: [],
@@ -245,6 +247,7 @@ export default function App() {
   const [recipeIngAmount, setRecipeIngAmount] = useState("");
 
   const [newSweetness, setNewSweetness] = useState("");
+  const [newCoffeeRoast, setNewCoffeeRoast] = useState(""); // ☕ ฟิลด์เพิ่มตัวเลือกคั่วกาแฟใหม่
   const [newMilk, setNewMilk] = useState("");
 
   const [addonName, setAddonName] = useState("");
@@ -275,6 +278,7 @@ export default function App() {
   });
 
   const [sweetness, setSweetness] = useState("");
+  const [coffeeRoast, setCoffeeRoast] = useState(""); // ☕ State สำหรับระดับความเข้มกาแฟ
   const [milk, setMilk] = useState(null);
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [itemNote, setItemNote] = useState("");
@@ -346,9 +350,11 @@ export default function App() {
     }
 
     const swOpts = item.sweetness_options || item.sweetnessOptions || [];
+    const roastOpts = item.coffee_roast_options || item.coffeeRoastOptions || ["คั่วอ่อน", "คั่วกลาง (Standard)", "คั่วเข้ม"];
     const milkOpts = item.milk_options || item.milkOptions || [];
 
     setSweetness(swOpts[0] || "100%");
+    setCoffeeRoast(item.category === "coffee" ? (roastOpts[1] || roastOpts[0] || "คั่วกลาง (Standard)") : ""); // ☕ ตั้งค่าเริ่มต้นเฉพาะหมวดกาแฟ
     setMilk(milkOpts[0] || null);
     setSelectedAddons([]);
     setItemNote("");
@@ -364,7 +370,9 @@ export default function App() {
     const sizeText = selectedSize ? selectedSize.name : "";
     const addonsLabel = selectedAddons.map((a) => a.label).join(", ");
     const milkLabel = milk ? milk.label : "";
-    const optionsText = [sizeText, sweetness, milkLabel, addonsLabel].filter(Boolean).join(" • ") || "ปกติ";
+    
+    // ☕ รวมความเข้มกาแฟไว้ในคำบรรยายออปชัน
+    const optionsText = [sizeText, coffeeRoast, sweetness, milkLabel, addonsLabel].filter(Boolean).join(" • ") || "ปกติ";
     const noteText = itemNote.trim();
 
     const cartId = `${selectedItemForCustom.id}-${optionsText}-${noteText}`;
@@ -390,6 +398,7 @@ export default function App() {
           recipe: activeRecipe,
           selectedMilk: milk,
           selectedAddonsList: selectedAddons,
+          coffeeRoast: coffeeRoast,
         },
       ];
     });
@@ -759,6 +768,17 @@ export default function App() {
     setNewSweetness("");
   };
 
+  // ☕ ฟังก์ชันเพิ่มระดับความเข้มกาแฟใน Admin Form
+  const addCoffeeRoastOption = () => {
+    const val = newCoffeeRoast.trim();
+    if (!val) return;
+    const current = itemForm.coffeeRoastText
+      ? itemForm.coffeeRoastText.split(",").map((s) => s.trim())
+      : [];
+    setItemForm({ ...itemForm, coffeeRoastText: [...current, val].join(", ") });
+    setNewCoffeeRoast("");
+  };
+
   const addMilkOption = () => {
     const val = newMilk.trim();
     if (!val) return;
@@ -804,6 +824,10 @@ export default function App() {
 
     const sweetnessOptions = itemForm.sweetnessText
       ? itemForm.sweetnessText.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+
+    const coffeeRoastOptions = itemForm.coffeeRoastText
+      ? itemForm.coffeeRoastText.split(",").map((s) => s.trim()).filter(Boolean)
       : [];
 
     const milkOptions = itemForm.milkText
@@ -852,6 +876,7 @@ export default function App() {
         "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400",
       in_stock: itemForm.inStock,
       sweetness_options: sweetnessOptions,
+      coffee_roast_options: coffeeRoastOptions, // ☕ เพิ่มข้อมูลลง Payload Supabase
       milk_options: milkOptions,
       addons,
       recipe: hasMultipleSizes ? [] : itemForm.recipe || [],
@@ -879,6 +904,7 @@ export default function App() {
       image: "",
       inStock: true,
       sweetnessText: "100%, 50%, 0%",
+      coffeeRoastText: "คั่วอ่อน, คั่วกลาง (Standard), คั่วเข้ม",
       milkText: "นมสดธรรมดา (+0)",
       addonsText: "เพิ่ม Shot กาแฟ (+25)",
       recipe: [],
@@ -901,6 +927,9 @@ export default function App() {
       sweetnessText: (item.sweetness_options || item.sweetnessOptions)
         ? (item.sweetness_options || item.sweetnessOptions).join(", ")
         : "",
+      coffeeRoastText: (item.coffee_roast_options || item.coffeeRoastOptions)
+        ? (item.coffee_roast_options || item.coffeeRoastOptions).join(", ")
+        : "คั่วอ่อน, คั่วกลาง (Standard), คั่วเข้ม",
       milkText: (item.milk_options || item.milkOptions)
         ? (item.milk_options || item.milkOptions).map((m) => `${m.label} (+${m.price})`).join(", ")
         : "",
@@ -969,7 +998,7 @@ export default function App() {
   const filterAvgValue =
     filterOrdersCount > 0 ? filterRevenue / filterOrdersCount : 0;
 
-  // 🎯 สรุปยอดเฉพาะวันปัจจุบัน (Today Only)
+  // สรุปยอดเฉพาะวันปัจจุบัน
   const isTodayDate = (d) => {
     const now = new Date();
     return (
@@ -1784,7 +1813,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* 🎯 จัดการ Layout ปุ่มเรียงเป็นแถวเดียวสวยงาม */}
             <div className="flex items-center gap-2.5 flex-wrap">
               <button
                 onClick={handleResetToToday}
@@ -1824,7 +1852,6 @@ export default function App() {
                 ))}
               </select>
 
-              {/* 🎯 ปุ่มย้ายมาต่อท้ายช่องวันที่ตรงนี้เรียบร้อยครับ */}
               <button
                 onClick={() => setIsShiftCloseOpen(true)}
                 className="bg-[#800020] hover:bg-[#5C0017] text-white font-black px-4 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2 text-xs cursor-pointer"
@@ -2633,6 +2660,63 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* ☕ ตัวเลือกความเข้มกาแฟในฟอร์ม Admin */}
+                  {itemForm.category === "coffee" && (
+                    <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
+                      <label className="font-extrabold text-[#334155] block flex items-center gap-1">
+                        <Flame size={14} className="text-[#800020]" /> ตัวเลือกระดับความเข้มกาแฟ / เมล็ดคั่ว
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {itemForm.coffeeRoastText ? (
+                          itemForm.coffeeRoastText.split(",").map((roast, idx) => (
+                            <span
+                              key={idx}
+                              className="bg-white border border-[#E2E8F0] px-2.5 py-1 rounded-lg text-[#0F172A] font-medium flex items-center gap-1 shadow-xs"
+                            >
+                              {roast.trim()}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const list = itemForm.coffeeRoastText
+                                    .split(",")
+                                    .map((s) => s.trim())
+                                    .filter((_, i) => i !== idx);
+                                  setItemForm({
+                                    ...itemForm,
+                                    coffeeRoastText: list.join(", "),
+                                  });
+                                }}
+                                className="text-[#94A3B8] hover:text-[#EF4444]"
+                              >
+                                <X size={12} />
+                              </button>
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[#94A3B8] text-[11px]">
+                            ไม่มีตัวเลือก
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-1.5 pt-1">
+                        <input
+                          type="text"
+                          value={newCoffeeRoast}
+                          onChange={(e) => setNewCoffeeRoast(e.target.value)}
+                          placeholder="เช่น คั่วคั่วเข้มพิเศษ"
+                          className="flex-1 bg-white p-2 border border-[#E2E8F0] rounded-lg text-xs outline-none font-semibold"
+                        />
+                        <button
+                          type="button"
+                          onClick={addCoffeeRoastOption}
+                          className="bg-[#800020] text-white px-3 py-1.5 rounded-lg font-black text-xs cursor-pointer"
+                        >
+                          + เพิ่ม
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* ระดับความหวาน */}
                   <div className="bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-2">
                     <label className="font-extrabold text-[#334155] block">
@@ -2867,6 +2951,7 @@ export default function App() {
                             image: "",
                             inStock: true,
                             sweetnessText: "100%, 50%, 0%",
+                            coffeeRoastText: "คั่วอ่อน, คั่วกลาง (Standard), คั่วเข้ม",
                             milkText: "นมสดธรรมดา (+0)",
                             addonsText: "เพิ่ม Shot กาแฟ (+25)",
                             recipe: [],
@@ -3597,7 +3682,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Customization Modal */}
+      {/* ☕ Customization Modal (รวมส่วนตัวเลือกระดับความเข้มกาแฟ) */}
       {selectedItemForCustom && (
         <div className="fixed inset-0 bg-[#0F172A]/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-[#E2E8F0] animate-fadeIn">
@@ -3626,6 +3711,7 @@ export default function App() {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-6 text-xs custom-scrollbar">
+              {/* ขนาดแก้ว */}
               {selectedItemForCustom.sizes && selectedItemForCustom.sizes.length > 0 && (
                 <div>
                   <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
@@ -3661,6 +3747,35 @@ export default function App() {
                 </div>
               )}
 
+              {/* ☕ ตัวเลือกระดับความเข้มกาแฟ / เมล็ดคั่ว (แสดงเฉพาะหมวด Coffee) */}
+              {selectedItemForCustom.category === "coffee" && (
+                <div>
+                  <label className="font-black text-[#800020] text-[11px] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <Flame size={15} /> ระดับความเข้มกาแฟ / เมล็ดคั่ว (Coffee Roast)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {(
+                      selectedItemForCustom.coffee_roast_options ||
+                      selectedItemForCustom.coffeeRoastOptions ||
+                      ["คั่วอ่อน", "คั่วกลาง (Standard)", "คั่วเข้ม"]
+                    ).map((roast) => (
+                      <button
+                        key={roast}
+                        onClick={() => setCoffeeRoast(roast)}
+                        className={`py-3 rounded-2xl border transition cursor-pointer font-black text-center ${
+                          coffeeRoast === roast
+                            ? "border-[#800020] bg-[#800020] text-white shadow-md"
+                            : "border-[#E2E8F0] text-[#64748B] hover:bg-[#FAF7F2]"
+                        }`}
+                      >
+                        {roast}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ระดับความหวาน */}
               {(selectedItemForCustom.sweetness_options || selectedItemForCustom.sweetnessOptions)?.length > 0 && (
                 <div>
                   <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
@@ -3680,6 +3795,7 @@ export default function App() {
                 </div>
               )}
 
+              {/* ตัวเลือกนม */}
               {(selectedItemForCustom.milk_options || selectedItemForCustom.milkOptions)?.length > 0 && (
                 <div>
                   <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
@@ -3700,6 +3816,7 @@ export default function App() {
                 </div>
               )}
 
+              {/* ท็อปปิ้งเพิ่มเติม */}
               {selectedItemForCustom.addons?.length > 0 && (
                 <div>
                   <label className="font-black text-[#64748B] text-[11px] uppercase tracking-wider block mb-2.5">
