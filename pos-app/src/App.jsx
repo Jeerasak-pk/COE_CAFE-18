@@ -735,16 +735,16 @@ export default function App() {
     }
 
     const newOrderObj = {
-      id: orderIdStr,
-      queue_no: queueNoStr,
-      customer_name: customerName.trim(),
-      total: total,
-      discount: effectiveDiscount,
-      status: "pending",
-      order_type: orderType,
-      payment_method: payMethodLabel,
-      items: cart
-    };
+  id: orderIdStr,
+  queue_no: queueNoStr,
+  customer_name: customerName.trim(),
+  total: total,
+  discount: effectiveDiscount,
+  status: "pending", // ต้องมั่นใจว่าตาราง orders มีคอลัมน์ status
+  order_type: orderType,
+  payment_method: payMethodLabel,
+  items: cart // ต้องมั่นใจว่าตาราง orders มีคอลัมน์ items (ชนิด JSON/JSONB)
+};
 
     try {
       await supabase.from("orders").insert([newOrderObj]);
