@@ -735,22 +735,21 @@ export default function App() {
     }
 
     const newOrderObj = {
-  id: orderIdStr,
-  queue_no: queueNoStr,
-  customer_name: customerName.trim(),
-  total: total,
-  discount: effectiveDiscount,
-  status: "pending", // ต้องมั่นใจว่าตาราง orders มีคอลัมน์ status
-  order_type: orderType,
-  payment_method: payMethodLabel,
-  items: cart // ต้องมั่นใจว่าตาราง orders มีคอลัมน์ items (ชนิด JSON/JSONB)
-};
+      id: orderIdStr,
+      queue_no: queueNoStr,
+      customer_name: customerName.trim(),
+      total: total,
+      discount: effectiveDiscount,
+      status: "pending",
+      order_type: orderType,
+      payment_method: payMethodLabel,
+      items: cart
+    };
 
     try {
       await supabase.from("orders").insert([newOrderObj]);
-      await fetchAllData();
+      // *เอา await fetchAllData(); ออกจากตรงนี้ เพื่อไม่ให้โหลดซ้ำซ้อนกับ Realtime*
 
-      // เพิ่มเติม: กำหนดข้อมูลออเดอร์เพื่อเด้งเปิดสลิปใบเสร็จทันทีหลังชำระเงินสำเร็จ
       const receiptObj = {
         id: orderIdStr,
         queueNo: queueNoStr,
@@ -4231,7 +4230,7 @@ export default function App() {
   >
     {editingCartId ? "บันทึกการแก้ไขออเดอร์" : "เพิ่มลงตะกร้า"}
   </button>
-</div>
+</div> 
           </div>
         </div>
       )}
