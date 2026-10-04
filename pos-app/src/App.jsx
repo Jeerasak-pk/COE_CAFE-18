@@ -4188,8 +4188,8 @@ export default function App() {
 
             <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
   {/* ปรับแก้ตรงนี้: เปลี่ยนจากตัวเลขธรรมดาให้เป็นช่อง input type="number" ให้พิมพ์ได้ */}
-  <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2]">
-  <div className="flex items-center gap-2 border border-[#E2E8F0] bg-white px-3 py-1.5 rounded-2xl shadow-xs">
+  <div className="p-5 border-t border-[#F1F5F9] flex gap-3 bg-[#FAF7F2] items-center">
+  <div className="flex items-center gap-1 border border-[#E2E8F0] bg-white px-3 py-1.5 rounded-2xl shadow-xs shrink-0">
     <button 
       onClick={() => setCustomQty((q) => Math.max(1, (Number(q) || 1) - 1))} 
       className="cursor-pointer text-[#64748B] hover:text-[#0F172A] transition p-1"
@@ -4203,16 +4203,14 @@ export default function App() {
       min="1"
       value={customQty}
       onChange={(e) => {
-        // อนุญาตให้พิมพ์ลบว่างได้ โดยเก็บค่าเป็น string ชั่วคราว
         setCustomQty(e.target.value);
       }}
       onBlur={() => {
-        // เมื่อคลิกออกนอกช่อง (Blur) ถ้าปล่อยว่างหรือค่าน้อยกว่า 1 ให้ปัดกลับเป็น 1 อัตโนมัติ
         if (customQty === "" || Number(customQty) < 1) {
           setCustomQty(1);
         }
       }}
-      className="w-14 text-center font-black text-[#0F172A] bg-transparent outline-none text-sm"
+      className="w-12 text-center font-black text-[#0F172A] bg-transparent outline-none text-sm"
     />
 
     <button 
@@ -4226,7 +4224,6 @@ export default function App() {
 
   <button
     onClick={() => {
-      // ตรวจสอบความถูกต้องก่อนกดเพิ่มลงตะกร้า (ถ้าช่องว่างให้บังคับเป็น 1)
       if (customQty === "" || Number(customQty) < 1) {
         setCustomQty(1);
       }
