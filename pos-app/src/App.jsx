@@ -341,16 +341,20 @@ export default function App() {
         };
       });
 
-      setOrderHistory(formatted);
+      // ป้องกันออเดอร์ซ้ำ: ใช้ Map หรือกรอง ID ที่ซ้ำกันออกทันที
+      const uniqueOrderHistory = Array.from(
+        new Map(formatted.map(item => [item.id, item])).values()
+      );
 
-      // แก้ไข: รองรับสถานะว่างหรือ pending/preparing เพื่อให้ออเดอร์เข้าหน้าจอครัวทันที
-      const activeKitchenList = formatted.filter((o) => {
+      setOrderHistory(uniqueOrderHistory);
+
+      const activeKitchenList = uniqueOrderHistory.filter((o) => {
         return o.status === "pending" || o.status === "preparing" || !o.status;
       });
       setKitchenOrders(activeKitchenList);
 
       const todayStr = new Date().toLocaleDateString("th-TH");
-      const todayCount = formatted.filter((o) => o.date === todayStr).length;
+      const todayCount = uniqueOrderHistory.filter((o) => o.date === todayStr).length;
       setOrderQueueCount(todayCount + 1);
     }
   };
